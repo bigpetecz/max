@@ -1,0 +1,12 @@
+---
+description: React web app conventions
+globs: apps/web/**
+alwaysApply: false
+---
+
+# apps/web
+
+- Session: `fetch(..., { credentials: 'include' })` — API sets httpOnly cookie
+- Google sign-in per `docs/specs/authentication.md`
+- No Playwright, no vault secrets in browser storage
+- Task approval UI must show title, price, description before `POST /tasks/:id/approve`

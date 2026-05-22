@@ -1,0 +1,30 @@
+---
+description: Max project conventions for AI agents
+alwaysApply: true
+---
+
+# Max
+
+Read `AGENTS.md` and `docs/IMPLEMENTATION.md` before implementing.
+
+## Security boundaries
+
+- LLM code lives only in `apps/api` (`ai` module).
+- Playwright only in `apps/worker` and `libs/integrations/*`.
+- Never put passwords, `storageState`, or `CREDENTIAL_KEK` in queue jobs, logs, or AI prompts.
+- Worker fetches site credentials via HMAC internal grant API — not from Postgres.
+
+## Code style
+
+- TypeScript strict; match existing Nx/Nest/React patterns in the repo.
+- Prefer small, focused changes aligned with the Phase 0 checklist in IMPLEMENTATION.md.
+- Minimize scope — do not scaffold Phase 2+ (Rohlik, voice, mobile) unless asked.
+
+## Docs
+
+- Canonical specs live under `docs/specs/` (see IMPLEMENTATION map).
+- Update `docs/IMPLEMENTATION.md` checkboxes when completing Phase 0 items.
+
+## Path rules
+
+When editing matching paths, also follow: `api.mdc`, `worker.mdc`, `spec-kit.mdc`, `web.mdc` under `.cursor/rules/`.

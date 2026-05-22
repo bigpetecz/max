@@ -1,13 +1,20 @@
 {
   "name": "@max/source",
   "version": "0.0.0",
+  "packageManager": "pnpm@10.11.0",
   "license": "MIT",
   "scripts": {},
   "private": true,
-  "dependencies": {},
   "devDependencies": {
     "@nx/js": "22.7.2",
+    "@nx/nest": "22.7.2",
+    "@nx/node": "22.7.2",
+    "@nx/react": "^22.7.2",
     "@nx/workspace": "22.7.2",
     "nx": "22.7.2"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }

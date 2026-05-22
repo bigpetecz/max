@@ -1,0 +1,19 @@
+---
+description: Task schema and Spec Kit conventions
+globs: libs/spec-kit/**,docs/specs/tasks/**
+alwaysApply: false
+---
+
+# libs/spec-kit
+
+- One Zod schema per `taskType` documented in `docs/specs/tasks/`
+- Export schema registry used by API (`ai`, `tasks`) for validation whitelist
+- AI may only emit registered `taskType` values
+- No imports from `apps/*` or `libs/integrations/*`
+
+When adding a task:
+
+1. Add `docs/specs/tasks/<name>.md`
+2. Implement Zod in spec-kit
+3. Register in task type enum / registry
+4. Update `docs/specs/tasks/README.md`

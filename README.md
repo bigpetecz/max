@@ -1,5 +1,13 @@
 # Max
 
+Nx monorepo for the Max project.
+
+## Project documentation
+
+Documentation: **[docs/PRE-PHASE-0.md](./docs/PRE-PHASE-0.md)** → **[docs/IMPLEMENTATION.md](./docs/IMPLEMENTATION.md)** · Agents: **[AGENTS.md](./AGENTS.md)** · After Nx: **[docs/POST-BOOTSTRAP-TODO.md](./docs/POST-BOOTSTRAP-TODO.md)**
+
+---
+
 <a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
 
 ✨ Your new, shiny [Nx workspace](https://nx.dev) is ready ✨.

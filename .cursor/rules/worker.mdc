@@ -1,0 +1,26 @@
+---
+description: Worker and Playwright integration conventions
+globs: apps/worker/**,libs/integrations/**
+alwaysApply: false
+---
+
+# apps/worker + integrations
+
+## Boundaries
+
+- No LLM imports, no `apps/api` imports, no Postgres client
+- No `CREDENTIAL_KEK`; fetch secrets via HMAC `POST /internal/credential-grants`
+- BullMQ job payload: `taskId`, `userId`, `taskType`, `payload` only
+
+## Workflows
+
+- Task steps: `docs/specs/tasks/*.md` — deterministic, testable
+- Playwright: per-user profile dir; apply `storageState` when grant provides it
+
+## Logging
+
+Never log passwords, `storageState`, or grant response bodies.
+
+## Internal API client
+
+Sign requests per `docs/specs/api-outline.md` (HMAC headers). Base URL from `API_INTERNAL_BASE_URL`.

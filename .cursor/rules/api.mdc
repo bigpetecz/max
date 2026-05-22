@@ -1,0 +1,30 @@
+---
+description: NestJS API control plane conventions
+globs: apps/api/**,libs/shared/**
+alwaysApply: false
+---
+
+# apps/api (NestJS)
+
+Read `docs/specs/api-outline.md` until `apps/api/openapi.json` exists — then treat OpenAPI as canonical.
+
+## Boundaries
+
+- Google SSO and session: `docs/specs/authentication.md`
+- Credential vault + `/internal/*`: `docs/specs/credential-vault.md`
+- No Playwright, no integration workflow execution in API
+- LLM only in `ai` module; output must pass `libs/spec-kit` Zod schemas
+
+## Swagger / OpenAPI
+
+- Use `@nestjs/swagger` decorators on controllers and DTOs
+- Dev UI: `/api/docs` (or `/docs` — pick one global prefix and document in README)
+- Export spec in CI or via script → `apps/api/openapi.json` for agents
+
+## Modules
+
+`auth`, `users`, `credentials`, `tasks`, `chat`, `ai`, `queue`, `integrations`
+
+## Env
+
+Copy from `.env.example` — `CREDENTIAL_KEK` and `DATABASE_URL` only on API, never worker.
