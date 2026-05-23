@@ -19,15 +19,15 @@ Platform sign-in for **Max**. Integration login (Sbazar, etc.) is separate: [cre
 
 ## 2. Technology choices
 
-| Piece            | Choice                                                          | Notes                                                                 |
-| ---------------- | --------------------------------------------------------------- | --------------------------------------------------------------------- |
-| Protocol         | OAuth 2.0 + OpenID Connect                                      | Google as IdP                                                         |
-| Flow             | Authorization Code with **PKCE**                                | Required for SPA/public client safety                                 |
-| Token validation | Verify Google `id_token` on API                                 | Never trust client-only parsing                                       |
-| NestJS           | `@nestjs/passport` + custom Google strategy, or `openid-client` | Team preference at implement time                                     |
-| React            | Redirect to Google; callback route                              | Or `@react-oauth/google` only if tokens forwarded to API for exchange |
+| Piece            | Choice                                                         | Notes                                                                 |
+| ---------------- | -------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Protocol         | OAuth 2.0 + OpenID Connect                                     | Google as IdP                                                         |
+| Flow             | Authorization Code with **PKCE**                               | Required for SPA/public client safety                                 |
+| Token validation | Passport Google strategy callback + server user mapping        | No client-side token trust                                            |
+| NestJS           | `@nestjs/passport` + `passport-google-oauth20` + `@nestjs/jwt` | Implemented baseline in `apps/api/src/app`                            |
+| React            | Redirect to Google; callback route                             | Or `@react-oauth/google` only if tokens forwarded to API for exchange |
 
-**MVP recommendation:** API-owned session cookie (httpOnly), not long-lived access token in browser storage.
+**Current baseline:** short-lived access JWT returned by `/auth/refresh` + httpOnly refresh-token cookie rotation.
 
 ---
 
@@ -46,7 +46,7 @@ Pick **one** callback owner (web or API) and document in repo `.env.example` —
 
 ---
 
-## 4. Sequence (API callback — recommended)
+## 4. Sequence (implemented baseline)
 
 ```mermaid
 sequenceDiagram
@@ -56,16 +56,15 @@ sequenceDiagram
   participant Google
 
   Browser->>Web: Click Sign in with Google
-  Web->>Google: /authorize?client_id&redirect_uri&scope=openid email profile&code_challenge
-  Google->>API: GET /auth/google/callback?code=...
-  API->>Google: POST token endpoint (code + client_secret + code_verifier)
-  Google->>API: id_token + access_token
-  API->>API: Verify id_token JWKS
-  API->>API: upsert users(google_sub, email, name)
-  API->>Browser: Set-Cookie session=... HttpOnly Secure SameSite=Lax
-  Browser->>Web: Redirect /app
-  Web->>API: GET /auth/me (cookie)
-  API->>Web: { userId, email, name }
+  Web->>API: GET /auth/google
+  API->>Google: Passport redirect
+  Google->>API: GET /auth/google/callback
+  API->>API: Google strategy validate -> upsert user
+  API->>Browser: Set-Cookie max_refresh_token=... HttpOnly SameSite=Lax
+  Browser->>Web: Redirect /
+  Web->>API: POST /auth/refresh (cookie)
+  API->>Web: { user, accessToken }
+  Web->>API: GET /auth/me (Authorization: Bearer accessToken)
 ```
 
 ### Scopes (minimum)
@@ -80,23 +79,24 @@ Do not request Gmail or Drive scopes.
 
 ## 5. API surface (proposed)
 
-| Method | Path                    | Auth    | Description                                  |
-| ------ | ----------------------- | ------- | -------------------------------------------- |
-| GET    | `/auth/google`          | Public  | Redirect to Google (or return auth URL JSON) |
-| GET    | `/auth/google/callback` | Public  | Exchange code, create session                |
-| POST   | `/auth/logout`          | Session | Invalidate session                           |
-| GET    | `/auth/me`              | Session | Current user profile                         |
+| Method | Path                    | Auth           | Description                                        |
+| ------ | ----------------------- | -------------- | -------------------------------------------------- |
+| GET    | `/auth/google`          | Public         | Start Google OAuth redirect                        |
+| GET    | `/auth/google/callback` | Public         | Passport callback, user upsert, refresh cookie set |
+| POST   | `/auth/refresh`         | Refresh cookie | Rotate refresh token and issue new access token    |
+| GET    | `/auth/me`              | Bearer JWT     | Current user profile                               |
+| POST   | `/auth/logout`          | Refresh cookie | Invalidate refresh token                           |
 
 All product routes (`/tasks`, `/chat`, `/credentials`) require valid session → `user_id` on request context.
 
 ---
 
-## 6. Session model (MVP)
+## 6. Token/session model (implemented baseline)
 
-| Approach                                       | Pros                            | Cons                             |
-| ---------------------------------------------- | ------------------------------- | -------------------------------- |
-| **DB session + httpOnly cookie** (recommended) | Revocable, simple, no JWT in JS | Requires session store           |
-| JWT in memory + refresh                        | Stateless API                   | Harder revoke; XSS if mishandled |
+| Approach                                               | Pros                               | Cons                                      |
+| ------------------------------------------------------ | ---------------------------------- | ----------------------------------------- |
+| **Access JWT + refresh cookie rotation (implemented)** | Revocable refresh, standard SPA UX | Requires refresh endpoint + token wiring  |
+| DB session + httpOnly cookie only                      | Simpler frontend                   | Harder mobile/API-client interoperability |
 
 **Recommended schema:**
 
@@ -110,7 +110,7 @@ sessions (
 )
 ```
 
-Cookie value: random 32+ bytes; store only `hash(cookie)` in DB.
+Refresh cookie value: random 32+ bytes; store only `hash(cookie)` in DB.
 
 **TTL:** 7 days sliding refresh on activity (tune in Phase 1).
 
@@ -149,24 +149,28 @@ No role-based admin in MVP.
 
 ## 9. Web app integration
 
-| Concern                | Guidance                                                     |
-| ---------------------- | ------------------------------------------------------------ |
-| Unauthenticated routes | `/`, `/login`, `/auth/callback`                              |
-| Protected routes       | `/app/*` — redirect to login if `GET /auth/me` 401           |
-| API client             | `fetch(..., { credentials: 'include' })` for cookie sessions |
-| CORS                   | API allows web origin with `credentials: true`               |
+| Concern                | Guidance                                                                                  |
+| ---------------------- | ----------------------------------------------------------------------------------------- |
+| Unauthenticated routes | `/`, `/login`, `/auth/callback`                                                           |
+| Protected routes       | `/app/*` — redirect to login if `GET /auth/me` 401                                        |
+| API client             | `POST /auth/refresh` with `credentials: 'include'`, then bearer token on protected routes |
+| CORS                   | API allows web origin with `credentials: true`                                            |
 
 ---
 
 ## 10. Security checklist
 
 - [ ] PKCE on authorization request
-- [ ] Validate `id_token` `aud` matches client ID
-- [ ] Validate `iss` is `accounts.google.com` or `https://accounts.google.com`
-- [ ] Reject expired tokens
+- [x] Passport Google callback validation in strategy flow
+- [x] Short-lived access JWT + refresh-token rotation
 - [ ] httpOnly + Secure cookies in production
-- [ ] CSRF: SameSite=Lax + state parameter on OAuth start
+- [x] SameSite=Lax refresh cookie
 - [ ] Rate-limit auth endpoints
+
+## 12. Integration testing status
+
+- API auth integration uses `@nestjs/testing` + `supertest` in `apps/api/test/api.int.spec.ts`.
+- Test-only Google guard bypass is enabled only when `AUTH_TEST_MODE=true` and never in production mode.
 
 ---
 

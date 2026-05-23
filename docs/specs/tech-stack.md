@@ -32,7 +32,7 @@ Aligned with [architecture.md](./architecture.md). ADRs: [0001](./decisions/0001
 | Area       | Choice                      | Notes                                                                                               |
 | ---------- | --------------------------- | --------------------------------------------------------------------------------------------------- |
 | Framework  | NestJS + SWC                | Modules: auth, users, **credentials**, tasks, chat, ai, queue, integrations                         |
-| API style  | REST (+ WebSocket/SSE)      | Real-time task updates                                                                              |
+| API style  | REST                        | Polling for task updates in MVP (ADR-0004)                                                          |
 | API docs   | `@nestjs/swagger` + OpenAPI | Dev UI `/api/docs`; export `apps/api/openapi.json` — [api-documentation.md](./api-documentation.md) |
 | Validation | Zod + Spec Kit              | AI output and task payloads                                                                         |
 | Database   | **PostgreSQL**              | Users, sessions, tasks, encrypted credentials — ADR-0003                                            |
@@ -41,11 +41,11 @@ Aligned with [architecture.md](./architecture.md). ADRs: [0001](./decisions/0001
 
 ## Authentication & identity
 
-| Area              | Choice                       | Notes                                                               |
-| ----------------- | ---------------------------- | ------------------------------------------------------------------- |
-| Platform sign-in  | **Google SSO** (OIDC)        | [authentication.md](./authentication.md), ADR-0001                  |
-| Session           | httpOnly cookie + DB session | API validates per request                                           |
-| Integration login | Credential vault             | Separate from Google — [credential-vault.md](./credential-vault.md) |
+| Area              | Choice                      | Notes                                                               |
+| ----------------- | --------------------------- | ------------------------------------------------------------------- |
+| Platform sign-in  | **Google SSO** (OIDC)       | [authentication.md](./authentication.md), ADR-0001                  |
+| Session           | Access JWT + refresh cookie | Passport Google + JWT guard + refresh-token rotation in API         |
+| Integration login | Credential vault            | Separate from Google — [credential-vault.md](./credential-vault.md) |
 
 ## Credentials & worker
 
@@ -90,13 +90,13 @@ Aligned with [architecture.md](./architecture.md). ADRs: [0001](./decisions/0001
 
 ## Tooling
 
-| Tool              | Purpose                       | Status                                          |
-| ----------------- | ----------------------------- | ----------------------------------------------- |
-| ESLint            | Linting                       | With Nx apps                                    |
-| Prettier          | Formatting                    | Configured                                      |
-| CI                | _TBD_                         | GitHub Actions or other                         |
-| Integration tests | Node test runner + Nx targets | API/worker connectivity smoke tests implemented |
-| E2E               | Playwright                    | Worker/browser flows planned; web e2e _TBD_     |
+| Tool              | Purpose                            | Status                                                             |
+| ----------------- | ---------------------------------- | ------------------------------------------------------------------ |
+| ESLint            | Linting                            | With Nx apps                                                       |
+| Prettier          | Formatting                         | Configured                                                         |
+| CI                | GitHub Actions + Nx                | PR affected lint/format; full lint/format on `main`                |
+| Integration tests | `@nestjs/testing` + supertest + Nx | API auth + health integration via Jest; worker smoke test retained |
+| E2E               | Playwright                         | Worker/browser flows planned; web e2e _TBD_                        |
 
 ## Third-party services
 

@@ -18,8 +18,8 @@ Checklist of recommendations to apply **after** generating the Nx monorepo (`app
 
 - [x] **Database:** PostgreSQL + Prisma — ADR-0003
 - [x] **Package manager:** pnpm
-- [ ] **Q5 Images:** Local worker paths vs S3 — document in IMPLEMENTATION when chosen
-- [ ] **Q1 API prefix** (default `/api`) — README + Nest `setGlobalPrefix`
+- [x] **Q5 Images:** Local worker paths (ADR-0004)
+- [x] **Q1 API prefix** `/api` (ADR-0004)
 - [ ] **Q2 OAuth callback** on API — match Google Console redirect URI
 - [ ] **Q3 SSE vs WebSocket** — implement one in S2
 - [x] `prisma init` in `apps/api`; first migration for architecture §6 tables
@@ -52,8 +52,8 @@ Checklist of recommendations to apply **after** generating the Nx monorepo (`app
 
 ### API implementation (Phase 0)
 
-- [ ] Google SSO routes per [authentication.md](./specs/authentication.md)
-- [ ] Session middleware / guard on protected routes
+- [x] Google SSO routes per [authentication.md](./specs/authentication.md) (Nest Passport + Google strategy)
+- [x] JWT auth guard baseline (`JwtAuthGuard`) and refresh-token rotation flow
 - [ ] Internal `POST /internal/credential-grants` + HMAC verification
 - [ ] Internal `POST /internal/storage-state` (worker session upload)
 - [ ] Envelope encryption service (`CREDENTIAL_KEK` only in API)
@@ -76,10 +76,12 @@ Checklist of recommendations to apply **after** generating the Nx monorepo (`app
 
 - [ ] `@nx/enforce-module-boundaries` rules matching [architecture.md](./specs/architecture.md) import table
 - [ ] ESLint boundary / dependency checks for `api` ↔ `worker` ↔ `integrations`
-- [ ] CI pipeline: `nx affected -t lint,test,build` on PR
+- [x] CI pipeline baseline: Nx lint + format checks on PRs (affected) and full checks on `main`
+- [ ] Extend CI to `nx affected -t lint,test,build` on PR
 - [ ] CI: export OpenAPI and fail if `openapi.json` drift vs committed copy (optional)
 - [ ] Contract tests against OpenAPI or Schemathesis (optional, later)
 - [x] Integration smoke tests: `api:integration`, `worker:integration`, and root `test:integration`
+- [x] API integration tests moved to `@nestjs/testing` + `supertest` (Jest runner)
 
 ---
 

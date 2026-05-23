@@ -63,7 +63,7 @@
     "integration": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "node --test apps/api/test/health.int.test.mjs"
+        "command": "jest -c apps/api/jest.config.cjs --runInBand"
       }
     },
     "lint": {

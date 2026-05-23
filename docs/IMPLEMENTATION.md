@@ -34,6 +34,24 @@ Single entry point for **humans and coding agents** implementing Max. Do not rea
 
 **After Nx bootstrap:** work through [POST-BOOTSTRAP-TODO.md](./POST-BOOTSTRAP-TODO.md) (tooling, Swagger, CI, agent hygiene).
 
+## Progress snapshot (2026-05-23)
+
+- [x] Nx workspace scaffolded (`web`, `api`, `worker`, `spec-kit`, `shared`, `integrations/sbazar`)
+- [x] Local infra running via `docker-compose.yml` (Postgres + Redis)
+- [x] Prisma schema + initial migration applied in `apps/api/prisma`
+- [x] API and worker health integration tests implemented and passing (`api:integration`, `worker:integration`, root `test:integration`)
+- [x] Google SSO auth baseline implemented in API + web using Nest Passport + JWT access token + refresh-token rotation
+- [x] API integration tests migrated to standard `@nestjs/testing` + `supertest` pattern (`apps/api/test/api.int.spec.ts`)
+- [x] CI + code quality baseline implemented:
+  - [x] Nx-managed lint targets across apps/libs
+  - [x] Nx format checks
+  - [x] Husky + lint-staged pre-commit workflow
+  - [x] GitHub Actions CI with affected lint/format on PRs and full checks on `main`
+
+## Recommended next step
+
+- Implement protected Phase 0 product routes (`/tasks`, `/chat`, `/credentials`) with `JwtAuthGuard` and enforce user scoping per [specs/authentication.md](./specs/authentication.md).
+
 ## Non-negotiable rules
 
 1. **AI never** controls the browser, holds credentials, or appears in the worker.
@@ -48,7 +66,7 @@ Single entry point for **humans and coding agents** implementing Max. Do not rea
 
 - [x] Nx: `apps/web` (React + Vite), `apps/api` (NestJS + SWC), `apps/worker`, `libs/spec-kit`, `libs/shared`, `libs/integrations/sbazar`
 - [x] Postgres + migrations: `users`, `sessions`, `tasks`, `integrations`, `integration_credentials`
-- [ ] Google SSO: routes in § authentication.md
+- [x] Google SSO auth baseline: Passport Google strategy + JWT access + refresh rotation routes
 - [ ] Spec Kit: `sbazar.createListing` Zod schema
 - [ ] React: login, chat shell, empty task list
 

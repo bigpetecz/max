@@ -106,7 +106,7 @@ Then continue **[POST-BOOTSTRAP-TODO.md](./POST-BOOTSTRAP-TODO.md) § A → B �
 
 - [ ] Swagger on API (POST-BOOTSTRAP § B) — best started in S1 alongside controllers
 - [x] `docker compose up -d` documented in README
-- [ ] Minimal CI (lint on PR) — POST-BOOTSTRAP § D
+- [x] Minimal CI baseline (Nx lint + format checks on PR, full checks on `main`) — POST-BOOTSTRAP § D
 - [ ] GitHub repo remote + branch protection (if team)
 
 ---
