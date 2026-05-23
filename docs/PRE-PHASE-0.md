@@ -15,16 +15,16 @@ Everything to prepare **before** Sprint 1 feature work. Phase 0 coding checklist
 
 ## 1. Local toolchain (install once)
 
-| Tool | Version / notes | Used for |
-| ---- | ----------------- | -------- |
-| Node.js | LTS 20+ or 22+ | Nx, Nest, React |
-| pnpm | Use Corepack (`corepack enable`) | Monorepo |
-| Docker Desktop | Optional but recommended | Postgres + Redis locally |
-| PostgreSQL | 15+ (or Docker only) | Users, tasks, vault |
-| Redis | 7+ (or Docker only) | BullMQ |
-| Ollama | Latest + pull a model | Local planner (`llama3`, `mistral`, etc.) |
-| Playwright browsers | After worker app exists | `npx playwright install chromium` |
-| Git | — | Repo already initialized |
+| Tool                | Version / notes                  | Used for                                  |
+| ------------------- | -------------------------------- | ----------------------------------------- |
+| Node.js             | LTS 20+ or 22+                   | Nx, Nest, React                           |
+| pnpm                | Use Corepack (`corepack enable`) | Monorepo                                  |
+| Docker Desktop      | Optional but recommended         | Postgres + Redis locally                  |
+| PostgreSQL          | 15+ (or Docker only)             | Users, tasks, vault                       |
+| Redis               | 7+ (or Docker only)              | BullMQ                                    |
+| Ollama              | Latest + pull a model            | Local planner (`llama3`, `mistral`, etc.) |
+| Playwright browsers | After worker app exists          | `npx playwright install chromium`         |
+| Git                 | —                                | Repo already initialized                  |
 
 Verify:
 
@@ -92,11 +92,11 @@ Defer: Q4 hosting, Q9 OpenAI fallback, KMS, Rohlik.
 
 This **is** the start of Phase 0 engineering — do before chat/AI/Sbazar E2E:
 
-- [ ] `nx g` apps: `web` (React + Vite), `api` (NestJS + SWC), `worker` (Node)
-- [ ] `nx g` libs: `spec-kit`, `shared`, `integrations-sbazar` (path `libs/integrations/sbazar`)
-- [ ] `docker-compose.yml` for Postgres + Redis
-- [ ] First migration / schema (tables in [architecture.md](./specs/architecture.md) §6)
-- [ ] `nx run-many` dev script or documented terminals (api :3000, web :4200, worker, redis)
+- [x] `nx g` apps: `web` (React + Vite), `api` (NestJS + SWC), `worker` (Node)
+- [x] `nx g` libs: `spec-kit`, `shared`, `integrations-sbazar` (path `libs/integrations/sbazar`)
+- [x] `docker-compose.yml` for Postgres + Redis
+- [x] First migration / schema (tables in [architecture.md](./specs/architecture.md) §6)
+- [x] `nx run-many` dev script or documented terminals (api :3000, web :4200, worker, redis)
 
 Then continue **[POST-BOOTSTRAP-TODO.md](./POST-BOOTSTRAP-TODO.md) § A → B → C** in order.
 
@@ -105,7 +105,7 @@ Then continue **[POST-BOOTSTRAP-TODO.md](./POST-BOOTSTRAP-TODO.md) § A → B �
 ## 5. Recommended before S2 (can slip to early week 2)
 
 - [ ] Swagger on API (POST-BOOTSTRAP § B) — best started in S1 alongside controllers
-- [ ] `docker compose up -d` documented in README
+- [x] `docker compose up -d` documented in README
 - [ ] Minimal CI (lint on PR) — POST-BOOTSTRAP § D
 - [ ] GitHub repo remote + branch protection (if team)
 
@@ -124,22 +124,22 @@ Then continue **[POST-BOOTSTRAP-TODO.md](./POST-BOOTSTRAP-TODO.md) § A → B �
 
 ## Suggested order (one day plan)
 
-| Order | Task | Time |
-| ----- | ---- | ---- |
-| 1 | Install toolchain + Docker | 30 min |
-| 2 | Google OAuth + `.env` secrets | 30 min |
-| 3 | Lock Q6, Q5, API prefix, SSE vs WS | 15 min |
-| 4 | Nx generate apps/libs + docker-compose | 2–4 h |
-| 5 | POST-BOOTSTRAP § A (migrations, dev scripts) | 2–4 h |
-| 6 | IMPLEMENTATION § S1 (auth shell, spec-kit, chat UI) | rest of week 1 |
+| Order | Task                                                | Time           |
+| ----- | --------------------------------------------------- | -------------- |
+| 1     | Install toolchain + Docker                          | 30 min         |
+| 2     | Google OAuth + `.env` secrets                       | 30 min         |
+| 3     | Lock Q6, Q5, API prefix, SSE vs WS                  | 15 min         |
+| 4     | Nx generate apps/libs + docker-compose              | 2–4 h          |
+| 5     | POST-BOOTSTRAP § A (migrations, dev scripts)        | 2–4 h          |
+| 6     | IMPLEMENTATION § S1 (auth shell, spec-kit, chat UI) | rest of week 1 |
 
 ---
 
 ## Quick reference
 
-| Question | Doc |
-| -------- | --- |
-| What to build? | [IMPLEMENTATION.md](./IMPLEMENTATION.md), [product-requirements.md](./specs/product-requirements.md) |
-| After nx g? | [POST-BOOTSTRAP-TODO.md](./POST-BOOTSTRAP-TODO.md) |
-| Google SSO setup? | [authentication.md](./specs/authentication.md) |
-| Worker secrets? | [credential-vault.md](./specs/credential-vault.md) |
+| Question          | Doc                                                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------------------------- |
+| What to build?    | [IMPLEMENTATION.md](./IMPLEMENTATION.md), [product-requirements.md](./specs/product-requirements.md) |
+| After nx g?       | [POST-BOOTSTRAP-TODO.md](./POST-BOOTSTRAP-TODO.md)                                                   |
+| Google SSO setup? | [authentication.md](./specs/authentication.md)                                                       |
+| Worker secrets?   | [credential-vault.md](./specs/credential-vault.md)                                                   |

@@ -8,24 +8,24 @@ Platform sign-in for **Max**. Integration login (Sbazar, etc.) is separate: [cre
 
 ## 1. Goals
 
-| Goal | Approach |
-| ---- | -------- |
-| Low friction sign-up | Google Single Sign-On (OIDC) |
-| No password management for Max | Google handles credentials |
-| Stable internal user id | Map Google `sub` → `users.id` |
-| Secure API access | Server-side session or short-lived JWT |
+| Goal                           | Approach                               |
+| ------------------------------ | -------------------------------------- |
+| Low friction sign-up           | Google Single Sign-On (OIDC)           |
+| No password management for Max | Google handles credentials             |
+| Stable internal user id        | Map Google `sub` → `users.id`          |
+| Secure API access              | Server-side session or short-lived JWT |
 
 ---
 
 ## 2. Technology choices
 
-| Piece | Choice | Notes |
-| ----- | ------ | ----- |
-| Protocol | OAuth 2.0 + OpenID Connect | Google as IdP |
-| Flow | Authorization Code with **PKCE** | Required for SPA/public client safety |
-| Token validation | Verify Google `id_token` on API | Never trust client-only parsing |
-| NestJS | `@nestjs/passport` + custom Google strategy, or `openid-client` | Team preference at implement time |
-| React | Redirect to Google; callback route | Or `@react-oauth/google` only if tokens forwarded to API for exchange |
+| Piece            | Choice                                                          | Notes                                                                 |
+| ---------------- | --------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Protocol         | OAuth 2.0 + OpenID Connect                                      | Google as IdP                                                         |
+| Flow             | Authorization Code with **PKCE**                                | Required for SPA/public client safety                                 |
+| Token validation | Verify Google `id_token` on API                                 | Never trust client-only parsing                                       |
+| NestJS           | `@nestjs/passport` + custom Google strategy, or `openid-client` | Team preference at implement time                                     |
+| React            | Redirect to Google; callback route                              | Or `@react-oauth/google` only if tokens forwarded to API for exchange |
 
 **MVP recommendation:** API-owned session cookie (httpOnly), not long-lived access token in browser storage.
 
@@ -80,12 +80,12 @@ Do not request Gmail or Drive scopes.
 
 ## 5. API surface (proposed)
 
-| Method | Path | Auth | Description |
-| ------ | ---- | ---- | ----------- |
-| GET | `/auth/google` | Public | Redirect to Google (or return auth URL JSON) |
-| GET | `/auth/google/callback` | Public | Exchange code, create session |
-| POST | `/auth/logout` | Session | Invalidate session |
-| GET | `/auth/me` | Session | Current user profile |
+| Method | Path                    | Auth    | Description                                  |
+| ------ | ----------------------- | ------- | -------------------------------------------- |
+| GET    | `/auth/google`          | Public  | Redirect to Google (or return auth URL JSON) |
+| GET    | `/auth/google/callback` | Public  | Exchange code, create session                |
+| POST   | `/auth/logout`          | Session | Invalidate session                           |
+| GET    | `/auth/me`              | Session | Current user profile                         |
 
 All product routes (`/tasks`, `/chat`, `/credentials`) require valid session → `user_id` on request context.
 
@@ -93,10 +93,10 @@ All product routes (`/tasks`, `/chat`, `/credentials`) require valid session →
 
 ## 6. Session model (MVP)
 
-| Approach | Pros | Cons |
-| -------- | ---- | ---- |
-| **DB session + httpOnly cookie** (recommended) | Revocable, simple, no JWT in JS | Requires session store |
-| JWT in memory + refresh | Stateless API | Harder revoke; XSS if mishandled |
+| Approach                                       | Pros                            | Cons                             |
+| ---------------------------------------------- | ------------------------------- | -------------------------------- |
+| **DB session + httpOnly cookie** (recommended) | Revocable, simple, no JWT in JS | Requires session store           |
+| JWT in memory + refresh                        | Stateless API                   | Harder revoke; XSS if mishandled |
 
 **Recommended schema:**
 
@@ -137,11 +137,11 @@ users (
 
 ## 8. Authorization (not authentication)
 
-| Rule | Enforcement |
-| ---- | ----------- |
-| User sees only own tasks | `WHERE user_id = :currentUser` |
-| User sees only own integration credentials | Same |
-| Worker is not a human user | Service HMAC — see [credential-vault.md](./credential-vault.md) |
+| Rule                                       | Enforcement                                                     |
+| ------------------------------------------ | --------------------------------------------------------------- |
+| User sees only own tasks                   | `WHERE user_id = :currentUser`                                  |
+| User sees only own integration credentials | Same                                                            |
+| Worker is not a human user                 | Service HMAC — see [credential-vault.md](./credential-vault.md) |
 
 No role-based admin in MVP.
 
@@ -149,12 +149,12 @@ No role-based admin in MVP.
 
 ## 9. Web app integration
 
-| Concern | Guidance |
-| ------- | -------- |
-| Unauthenticated routes | `/`, `/login`, `/auth/callback` |
-| Protected routes | `/app/*` — redirect to login if `GET /auth/me` 401 |
-| API client | `fetch(..., { credentials: 'include' })` for cookie sessions |
-| CORS | API allows web origin with `credentials: true` |
+| Concern                | Guidance                                                     |
+| ---------------------- | ------------------------------------------------------------ |
+| Unauthenticated routes | `/`, `/login`, `/auth/callback`                              |
+| Protected routes       | `/app/*` — redirect to login if `GET /auth/me` 401           |
+| API client             | `fetch(..., { credentials: 'include' })` for cookie sessions |
+| CORS                   | API allows web origin with `credentials: true`               |
 
 ---
 
@@ -170,7 +170,7 @@ No role-based admin in MVP.
 
 ---
 
-## 11. What Google SSO does *not* do
+## 11. What Google SSO does _not_ do
 
 - Does not store Sbazar/Rohlik passwords
 - Does not replace worker integration login

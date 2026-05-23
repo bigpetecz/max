@@ -12,13 +12,13 @@ Platform login (Google) is separate: [authentication.md](./authentication.md).
 
 The worker must log into Sbazar (and later Rohlik) as the **end user**, but:
 
-| Requirement | Implication |
-| ----------- | ------------- |
-| AI must not see secrets | Secrets never in planner prompts |
-| Worker must not hold master keys | No `CREDENTIAL_KEK` in worker env |
-| Queue should not leak secrets | BullMQ job = task metadata only |
-| Sessions should reuse when possible | Persist Playwright state encrypted |
-| Compromised worker is bounded | Short-lived, single-use credential exposure |
+| Requirement                         | Implication                                 |
+| ----------------------------------- | ------------------------------------------- |
+| AI must not see secrets             | Secrets never in planner prompts            |
+| Worker must not hold master keys    | No `CREDENTIAL_KEK` in worker env           |
+| Queue should not leak secrets       | BullMQ job = task metadata only             |
+| Sessions should reuse when possible | Persist Playwright state encrypted          |
+| Compromised worker is bounded       | Short-lived, single-use credential exposure |
 
 ---
 
@@ -32,9 +32,9 @@ This is the default for Max unless an ADR supersedes it.
 
 ## 3. Credential types
 
-| Kind | `kind` field | When to use |
-| ---- | ------------ | ----------- |
-| `password` | Username + password JSON encrypted | User supplies Sbazar credentials in settings |
+| Kind            | `kind` field                             | When to use                                       |
+| --------------- | ---------------------------------------- | ------------------------------------------------- |
+| `password`      | Username + password JSON encrypted       | User supplies Sbazar credentials in settings      |
 | `storage_state` | Playwright `storageState` JSON encrypted | After successful login; preferred for repeat runs |
 
 Both can coexist per `user_id` + `integration_id`; worker prefers `storage_state` if present and not expired, else `password`.
@@ -56,12 +56,12 @@ Store in DB:
   key_version    = int (for KEK rotation)
 ```
 
-| Field | Description |
-| ----- | ----------- |
-| `ciphertext` | Encrypted payload |
-| `dek_encrypted` | Encrypted DEK |
-| `key_version` | Which KEK version encrypted the DEK |
-| `algorithm` | `AES-256-GCM` (document in ADR) |
+| Field           | Description                         |
+| --------------- | ----------------------------------- |
+| `ciphertext`    | Encrypted payload                   |
+| `dek_encrypted` | Encrypted DEK                       |
+| `key_version`   | Which KEK version encrypted the DEK |
+| `algorithm`     | `AES-256-GCM` (document in ADR)     |
 
 **Rotation:** New KEK version decrypts old rows on read (re-encrypt on update) — Phase 1.
 
@@ -97,13 +97,13 @@ sequenceDiagram
 
 ### Grant endpoint rules
 
-| Rule | Value |
-| ---- | ----- |
+| Rule           | Value                                                    |
+| -------------- | -------------------------------------------------------- |
 | Authentication | HMAC-SHA256 shared secret (`WORKER_SERVICE_HMAC_SECRET`) |
-| Payload signed | `jobId`, `taskId`, `timestamp` (max 30s skew) |
-| Response TTL | Credentials valid for one run; suggest 60s |
-| Single use | Second request with same job → 409 |
-| Audit | `credential_grants` table: who, when, job_id |
+| Payload signed | `jobId`, `taskId`, `timestamp` (max 30s skew)            |
+| Response TTL   | Credentials valid for one run; suggest 60s               |
+| Single use     | Second request with same job → 409                       |
+| Audit          | `credential_grants` table: who, when, job_id             |
 
 ### Worker implementation sketch
 
@@ -123,12 +123,12 @@ try {
 
 Per user + integration, store encrypted `storageState` after successful login.
 
-| Path | Detail |
-| ---- | ------ |
-| Directory (worker local) | `profiles/{userId}/{integrationSlug}/` — chromium user data (optional) |
-| Authoritative session blob | Encrypted `storage_state` in vault (API) |
-| On run start | Worker applies `storageState` to `browser.newContext({ storageState })` |
-| On run end (success) | Worker exports updated state → `POST /internal/storage-state` (encrypted by API) |
+| Path                       | Detail                                                                           |
+| -------------------------- | -------------------------------------------------------------------------------- |
+| Directory (worker local)   | `profiles/{userId}/{integrationSlug}/` — chromium user data (optional)           |
+| Authoritative session blob | Encrypted `storage_state` in vault (API)                                         |
+| On run start               | Worker applies `storageState` to `browser.newContext({ storageState })`          |
+| On run end (success)       | Worker exports updated state → `POST /internal/storage-state` (encrypted by API) |
 
 **Phase 0 shortcut:** User completes one manual login in headed browser; worker saves state back to API. Avoids storing password in Week 1 if UX allows.
 
@@ -163,51 +163,51 @@ Per user + integration, store encrypted `storageState` after successful login.
 
 ## 8. Alternatives considered
 
-| Approach | Verdict |
-| -------- | ------- |
-| Secrets in BullMQ job (encrypted blob) | Rejected — Redis exposure, replay risk |
-| Worker reads Postgres directly | Rejected — DB creds in worker widen blast radius |
-| HashiCorp Vault / cloud KMS only | Valid for production later; envelope + env KEK OK for MVP |
-| Password only, no storageState | Weak UX; session reuse is a product requirement |
-| AI fills login forms | Rejected — violates core principles |
+| Approach                               | Verdict                                                   |
+| -------------------------------------- | --------------------------------------------------------- |
+| Secrets in BullMQ job (encrypted blob) | Rejected — Redis exposure, replay risk                    |
+| Worker reads Postgres directly         | Rejected — DB creds in worker widen blast radius          |
+| HashiCorp Vault / cloud KMS only       | Valid for production later; envelope + env KEK OK for MVP |
+| Password only, no storageState         | Weak UX; session reuse is a product requirement           |
+| AI fills login forms                   | Rejected — violates core principles                       |
 
 ---
 
 ## 9. Phased rollout (aligned with agile plan)
 
-| Sprint phase | Deliverable |
-| ------------ | ----------- |
-| **Phase 0** | Grant endpoint contract; optional `storage_state` from guided login; minimal `integration_credentials` table |
-| **Phase 1** | Full password vault UI; KEK rotation plan; retry + session expiry detection |
-| **Phase 2+** | Rohlik rows same schema; per-integration credential `kind` metadata |
+| Sprint phase | Deliverable                                                                                                  |
+| ------------ | ------------------------------------------------------------------------------------------------------------ |
+| **Phase 0**  | Grant endpoint contract; optional `storage_state` from guided login; minimal `integration_credentials` table |
+| **Phase 1**  | Full password vault UI; KEK rotation plan; retry + session expiry detection                                  |
+| **Phase 2+** | Rohlik rows same schema; per-integration credential `kind` metadata                                          |
 
 ---
 
 ## 10. Failure modes
 
-| Symptom | Handling |
-| ------- | -------- |
-| Grant expired | Worker fails job; user retries |
+| Symptom         | Handling                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------ |
+| Grant expired   | Worker fails job; user retries                                                             |
 | Invalid session | Integration detects redirect to login → fail with `SESSION_EXPIRED` → UI prompts reconnect |
-| Decrypt failure | API alert; job not started |
-| HMAC invalid | 401; log possible intrusion |
+| Decrypt failure | API alert; job not started                                                                 |
+| HMAC invalid    | 401; log possible intrusion                                                                |
 
 ---
 
 ## 11. Logging & observability
 
-| Allowed in logs | Forbidden |
-| ----------------- | --------- |
+| Allowed in logs                                 | Forbidden                                   |
+| ----------------------------------------------- | ------------------------------------------- |
 | `userId`, `integrationSlug`, `jobId`, `grantId` | Passwords, `storageState` cookies, JWT, KEK |
-| “Credential grant issued” | Decrypted payload |
+| “Credential grant issued”                       | Decrypted payload                           |
 
 ---
 
 ## 12. API modules (NestJS)
 
-| Module | Responsibility |
-| ------ | ---------------- |
-| `credentials` | CRUD encrypted rows (user-facing) |
+| Module                 | Responsibility                                   |
+| ---------------------- | ------------------------------------------------ |
+| `credentials`          | CRUD encrypted rows (user-facing)                |
 | `credentials/internal` | Grants + storage-state upload (worker HMAC only) |
 
 `integrations` module exposes which sites user has connected (boolean + last verified_at), never raw secrets.

@@ -6,16 +6,31 @@
   "scripts": {
     "dev": "pnpm nx run-many -t serve -p web api worker --parallel=3",
     "build": "pnpm nx run-many -t build -p web api worker --parallel=3",
+    "lint": "pnpm nx run-many -t lint --parallel=3",
+    "lint:fix": "pnpm nx run-many -t lint --parallel=3 -- --fix",
+    "format": "pnpm nx format:write --all",
+    "format:check": "pnpm nx format:check --all",
     "db:up": "docker-compose up -d postgres redis",
     "db:down": "docker-compose down",
     "verify:connectivity": "node ./scripts/verify-connectivity.mjs",
     "test:integration": "pnpm nx run api:integration && pnpm nx run worker:integration",
     "prisma:generate": "prisma generate --schema apps/api/prisma/schema.prisma",
     "prisma:migrate:dev": "prisma migrate dev --schema apps/api/prisma/schema.prisma",
-    "prisma:studio": "prisma studio --schema apps/api/prisma/schema.prisma"
+    "prisma:studio": "prisma studio --schema apps/api/prisma/schema.prisma",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,css,scss,html}": [
+      "prettier --write"
+    ]
   },
   "private": true,
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.0",
     "@nx/esbuild": "22.7.2",
@@ -37,14 +52,20 @@
     "@vitejs/plugin-react-swc": "^4.3.0",
     "@vitest/ui": "~4.1.0",
     "esbuild": "^0.27.0",
+    "eslint": "^10.4.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.6.0",
+    "husky": "^9.1.7",
     "jiti": "2.4.2",
     "jsdom": "~22.1.0",
+    "lint-staged": "^17.0.5",
     "nx": "22.7.2",
     "prettier": "~3.6.2",
     "prisma": "^6.11.1",
     "swc-loader": "^0.2.7",
     "tslib": "^2.3.0",
     "typescript": "~5.9.2",
+    "typescript-eslint": "^8.59.4",
     "vite": "^8.0.0",
     "vitest": "~4.1.0",
     "webpack-cli": "^5.1.4"

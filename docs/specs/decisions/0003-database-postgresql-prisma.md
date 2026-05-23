@@ -31,10 +31,10 @@ Use **PostgreSQL** as the primary database and **Prisma** as the ORM in `apps/ap
 
 ## Alternatives considered
 
-| Alternative | Why not chosen |
-| ----------- | -------------- |
+| Alternative        | Why not chosen                                              |
+| ------------------ | ----------------------------------------------------------- |
 | MongoDB + Mongoose | Weaker fit for FKs, grants audit, and locked security model |
-| TypeORM | Valid; team chose Prisma |
+| TypeORM            | Valid; team chose Prisma                                    |
 
 ## References
 

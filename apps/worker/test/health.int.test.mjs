@@ -28,7 +28,9 @@ function runCommand(command, args, env = {}) {
       if (code === 0) {
         resolve();
       } else {
-        reject(new Error(`${command} ${args.join(' ')} exited with code ${code}`));
+        reject(
+          new Error(`${command} ${args.join(' ')} exited with code ${code}`),
+        );
       }
     });
   });
@@ -57,7 +59,9 @@ async function waitForHealth(url, timeoutMs, child) {
 
   while (Date.now() < deadline) {
     if (child?.exitCode !== null) {
-      throw new Error(`Process exited before health endpoint became ready: ${url}`);
+      throw new Error(
+        `Process exited before health endpoint became ready: ${url}`,
+      );
     }
 
     try {
@@ -80,7 +84,8 @@ test('worker health endpoint reports redis and api as up', async () => {
 
   const api = startProcess('pnpm', ['nx', 'serve', 'api'], {
     API_PORT: String(API_PORT),
-    DATABASE_URL: process.env.DATABASE_URL || 'postgresql://max:max@localhost:5432/max',
+    DATABASE_URL:
+      process.env.DATABASE_URL || 'postgresql://max:max@localhost:5432/max',
     REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
   });
 
@@ -105,7 +110,11 @@ test('worker health endpoint reports redis and api as up', async () => {
       stdio: 'inherit',
     });
 
-    const workerPayload = await waitForHealth(WORKER_HEALTH_URL, 120000, worker);
+    const workerPayload = await waitForHealth(
+      WORKER_HEALTH_URL,
+      120000,
+      worker,
+    );
     assert.equal(workerPayload.status, 'ok');
     assert.equal(workerPayload.dependencies.redis, 'up');
     assert.equal(workerPayload.dependencies.api, 'up');

@@ -40,13 +40,13 @@ These tasks are:
 
 ## 4. Goals (MVP / Phase 0)
 
-| Goal | Description |
-| ---- | ----------- |
+| Goal                    | Description                                     |
+| ----------------------- | ----------------------------------------------- |
 | Sbazar listing via chat | End-to-end create listing from natural language |
-| Structured AI tasks | Intent → JSON; **no** direct AI browser control |
-| Playwright execution | Deterministic worker automation |
-| Manual approval | User approves before publish/execute |
-| Persistent sessions | Login session reuse via browser profiles |
+| Structured AI tasks     | Intent → JSON; **no** direct AI browser control |
+| Playwright execution    | Deterministic worker automation                 |
+| Manual approval         | User approves before publish/execute            |
+| Persistent sessions     | Login session reuse via browser profiles        |
 
 ---
 
@@ -63,6 +63,7 @@ These tasks are:
 ## 6. Core user flow (MVP)
 
 1. **User sends chat request:**
+
    > "Sell my binoculars for 12,000 CZK on Sbazar"
 
 2. **System:**
@@ -90,55 +91,55 @@ These tasks are:
 
 ### 7.1 Chat interface
 
-| Capability | MVP |
-| ---------- | --- |
-| Text input | Yes |
-| Task history | Yes |
+| Capability    | MVP                             |
+| ------------- | ------------------------------- |
+| Text input    | Yes                             |
+| Task history  | Yes                             |
 | Approval step | Yes — required before execution |
 
 ### 7.2 Task generation
 
-| Capability | MVP |
-| ---------- | --- |
-| LLM intent → structured JSON | Yes |
-| Schema validation | Yes — Spec Kit |
-| Direct AI browser control | **No** |
+| Capability                   | MVP            |
+| ---------------------------- | -------------- |
+| LLM intent → structured JSON | Yes            |
+| Schema validation            | Yes — Spec Kit |
+| Direct AI browser control    | **No**         |
 
 ### 7.3 Workflow execution
 
-| Capability | MVP |
-| ---------- | --- |
-| Deterministic Playwright automation | Yes |
-| Integrations | **Sbazar only** |
+| Capability                          | MVP             |
+| ----------------------------------- | --------------- |
+| Deterministic Playwright automation | Yes             |
+| Integrations                        | **Sbazar only** |
 
 ### 7.4 Credential management
 
-| Capability | MVP |
-| ---------- | --- |
-| Encrypted storage | Yes |
-| Session reuse | Yes — per-user browser profiles |
-| AI access to secrets | **No** |
+| Capability           | MVP                             |
+| -------------------- | ------------------------------- |
+| Encrypted storage    | Yes                             |
+| Session reuse        | Yes — per-user browser profiles |
+| AI access to secrets | **No**                          |
 
 ---
 
 ## 8. Future features
 
-| Feature | Phase / notes |
-| ------- | ------------- |
+| Feature                    | Phase / notes                                                  |
+| -------------------------- | -------------------------------------------------------------- |
 | Rohlik shopping automation | Phase 2 — see [agile-project-plan.md](./agile-project-plan.md) |
-| Voice input/output | Phase 3 |
-| Mobile app (SwiftUI) | Phase 4 |
-| Multi-user support | Post-MVP product expansion |
-| Scheduling automation | Phase 3 |
-| AI memory / preferences | Later — personalization without breaking task contracts |
+| Voice input/output         | Phase 3                                                        |
+| Mobile app (SwiftUI)       | Phase 4                                                        |
+| Multi-user support         | Post-MVP product expansion                                     |
+| Scheduling automation      | Phase 3                                                        |
+| AI memory / preferences    | Later — personalization without breaking task contracts        |
 
 ---
 
 ## 9. Traceability
 
-| PRD section | Detailed specs |
-| ----------- | -------------- |
-| Sprints, DoD, timeline | [agile-project-plan.md](./agile-project-plan.md) |
-| FR/NFR tables | [requirements.md](./requirements.md) |
-| Components, security | [architecture.md](./architecture.md) |
+| PRD section             | Detailed specs                                                                         |
+| ----------------------- | -------------------------------------------------------------------------------------- |
+| Sprints, DoD, timeline  | [agile-project-plan.md](./agile-project-plan.md)                                       |
+| FR/NFR tables           | [requirements.md](./requirements.md)                                                   |
+| Components, security    | [architecture.md](./architecture.md)                                                   |
 | Google SSO, credentials | [authentication.md](./authentication.md), [credential-vault.md](./credential-vault.md) |

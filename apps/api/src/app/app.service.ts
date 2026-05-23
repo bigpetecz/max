@@ -7,7 +7,7 @@ type DependencyStatus = 'up' | 'down';
 @Injectable()
 export class AppService {
   getData(): { message: string } {
-    return ({ message: 'Hello API' });
+    return { message: 'Hello API' };
   }
 
   async getHealth() {

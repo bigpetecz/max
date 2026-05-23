@@ -8,40 +8,40 @@ Proposed REST surface for agents implementing `apps/api`.
 
 ## Public — auth
 
-| Method | Path | Description |
-| ------ | ---- | ----------- |
-| GET | `/auth/google` | Redirect or return Google authorize URL |
-| GET | `/auth/google/callback` | Exchange code, set session cookie |
-| POST | `/auth/logout` | Clear session |
-| GET | `/auth/me` | `{ id, email, displayName }` |
+| Method | Path                    | Description                             |
+| ------ | ----------------------- | --------------------------------------- |
+| GET    | `/auth/google`          | Redirect or return Google authorize URL |
+| GET    | `/auth/google/callback` | Exchange code, set session cookie       |
+| POST   | `/auth/logout`          | Clear session                           |
+| GET    | `/auth/me`              | `{ id, email, displayName }`            |
 
 ## Public — chat & tasks
 
-| Method | Path | Description |
-| ------ | ---- | ----------- |
-| POST | `/chat/messages` | `{ content }` → AI draft task |
-| GET | `/chat/threads/:id/messages` | History |
-| GET | `/tasks` | List user tasks |
-| GET | `/tasks/:id` | Task + status + payload |
-| POST | `/tasks/:id/approve` | `PendingApproval` → enqueue |
-| POST | `/tasks/:id/reject` | Cancel draft |
-| GET | `/tasks/:id` | Poll for status (MVP — no SSE/WebSocket); optional `?since=` for chat |
+| Method | Path                         | Description                                                           |
+| ------ | ---------------------------- | --------------------------------------------------------------------- |
+| POST   | `/chat/messages`             | `{ content }` → AI draft task                                         |
+| GET    | `/chat/threads/:id/messages` | History                                                               |
+| GET    | `/tasks`                     | List user tasks                                                       |
+| GET    | `/tasks/:id`                 | Task + status + payload                                               |
+| POST   | `/tasks/:id/approve`         | `PendingApproval` → enqueue                                           |
+| POST   | `/tasks/:id/reject`          | Cancel draft                                                          |
+| GET    | `/tasks/:id`                 | Poll for status (MVP — no SSE/WebSocket); optional `?since=` for chat |
 
 ## Public — integrations & credentials
 
-| Method | Path | Description |
-| ------ | ---- | ----------- |
-| GET | `/integrations` | `{ slug, connected, lastVerifiedAt }[]` |
-| POST | `/integrations/sbazar/credentials` | Store encrypted password `{ username, password }` |
-| POST | `/integrations/sbazar/establish-session` | Enqueue guided login job (Phase 0 shortcut) |
-| DELETE | `/integrations/sbazar/credentials` | Disconnect |
+| Method | Path                                     | Description                                       |
+| ------ | ---------------------------------------- | ------------------------------------------------- |
+| GET    | `/integrations`                          | `{ slug, connected, lastVerifiedAt }[]`           |
+| POST   | `/integrations/sbazar/credentials`       | Store encrypted password `{ username, password }` |
+| POST   | `/integrations/sbazar/establish-session` | Enqueue guided login job (Phase 0 shortcut)       |
+| DELETE | `/integrations/sbazar/credentials`       | Disconnect                                        |
 
 ## Internal — worker only (HMAC)
 
-| Method | Path | Body | Response |
-| ------ | ---- | ---- | -------- |
-| POST | `/internal/credential-grants` | `{ jobId, taskId, timestamp }` + signature header | `{ kind, username?, password?, storageState? }` TTL ~60s |
-| POST | `/internal/storage-state` | `{ integrationSlug, storageState }` + job context | 204 — worker uploads refreshed session |
+| Method | Path                          | Body                                              | Response                                                 |
+| ------ | ----------------------------- | ------------------------------------------------- | -------------------------------------------------------- |
+| POST   | `/internal/credential-grants` | `{ jobId, taskId, timestamp }` + signature header | `{ kind, username?, password?, storageState? }` TTL ~60s |
+| POST   | `/internal/storage-state`     | `{ integrationSlug, storageState }` + job context | 204 — worker uploads refreshed session                   |
 
 ### HMAC signing (worker → API)
 

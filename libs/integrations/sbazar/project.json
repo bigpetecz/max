@@ -6,16 +6,18 @@
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/integrations/sbazar",
         "main": "libs/integrations/sbazar/src/index.ts",
         "tsConfig": "libs/integrations/sbazar/tsconfig.lib.json",
-        "assets": [
-          "libs/integrations/sbazar/*.md"
-        ]
+        "assets": ["libs/integrations/sbazar/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint libs/integrations/sbazar"
       }
     }
   },

@@ -6,16 +6,18 @@
   "targets": {
     "build": {
       "executor": "@nx/js:tsc",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/spec-kit",
         "main": "libs/spec-kit/src/index.ts",
         "tsConfig": "libs/spec-kit/tsconfig.lib.json",
-        "assets": [
-          "libs/spec-kit/*.md"
-        ]
+        "assets": ["libs/spec-kit/*.md"]
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint libs/spec-kit"
       }
     }
   },

@@ -4,12 +4,12 @@ Creates and publishes a classified listing on Sbazar after user approval.
 
 ## Payload schema (Zod sketch)
 
-| Field | Type | Required | Rules |
-| ----- | ---- | -------- | ----- |
-| `title` | string | yes | 3–120 chars |
-| `price` | number | yes | CZK, integer, > 0 |
-| `description` | string | yes | 10–5000 chars |
-| `imagePaths` | string[] | no | Local paths worker resolves in Phase 0; Q5 for storage |
+| Field         | Type     | Required | Rules                                                  |
+| ------------- | -------- | -------- | ------------------------------------------------------ |
+| `title`       | string   | yes      | 3–120 chars                                            |
+| `price`       | number   | yes      | CZK, integer, > 0                                      |
+| `description` | string   | yes      | 10–5000 chars                                          |
+| `imagePaths`  | string[] | no       | Local paths worker resolves in Phase 0; Q5 for storage |
 
 ```typescript
 // libs/spec-kit — implement from this spec

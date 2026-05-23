@@ -35,11 +35,11 @@ Workers need Sbazar (and later Rohlik) credentials or browser sessions to execut
 
 ## Alternatives considered
 
-| Alternative | Why not chosen |
-| ----------- | -------------- |
-| Credentials in Redis job JSON | Persisted queue leakage risk |
-| Worker reads DB directly | Expands compromise blast radius |
-| Only passwords, no storage state | Poor UX; fragile sessions |
+| Alternative                            | Why not chosen                                   |
+| -------------------------------------- | ------------------------------------------------ |
+| Credentials in Redis job JSON          | Persisted queue leakage risk                     |
+| Worker reads DB directly               | Expands compromise blast radius                  |
+| Only passwords, no storage state       | Poor UX; fragile sessions                        |
 | Cloud KMS only (no app-level envelope) | Defer to production; envelope sufficient for MVP |
 
 ## References

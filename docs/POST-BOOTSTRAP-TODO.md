@@ -88,7 +88,7 @@ Checklist of recommendations to apply **after** generating the Nx monorepo (`app
 - [ ] Tick [IMPLEMENTATION.md](./IMPLEMENTATION.md) Phase 0 checkboxes as items ship (source of truth for “done”)
 - [ ] Reference **FR IDs** from [requirements.md](./specs/requirements.md) in PR titles/commits (e.g. `feat(api): Google callback FR-000`)
 - [ ] Add `.github/pull_request_template.md` with:
-  - [ ] Spec impact: IMPLEMENTATION / requirements FR-___
+  - [ ] Spec impact: IMPLEMENTATION / requirements FR-\_\_\_
   - [ ] Security: no secrets in queue/logs/AI prompts
 - [ ] Add `CONTRIBUTING.md` or section in README: agent prompt template —
   > Read `AGENTS.md` → complete IMPLEMENTATION § S1 item X only. Do not implement Rohlik/voice/mobile.
@@ -120,9 +120,9 @@ Checklist of recommendations to apply **after** generating the Nx monorepo (`app
 
 ## Quick links
 
-| Topic | Doc |
-| ----- | --- |
-| Phase 0 features | [IMPLEMENTATION.md](./IMPLEMENTATION.md) |
-| Sprints | [agile-project-plan.md](./specs/agile-project-plan.md) |
-| API routes (plan) | [api-outline.md](./specs/api-outline.md) |
-| Swagger strategy | [api-documentation.md](./specs/api-documentation.md) |
+| Topic             | Doc                                                    |
+| ----------------- | ------------------------------------------------------ |
+| Phase 0 features  | [IMPLEMENTATION.md](./IMPLEMENTATION.md)               |
+| Sprints           | [agile-project-plan.md](./specs/agile-project-plan.md) |
+| API routes (plan) | [api-outline.md](./specs/api-outline.md)               |
+| Swagger strategy  | [api-documentation.md](./specs/api-documentation.md)   |

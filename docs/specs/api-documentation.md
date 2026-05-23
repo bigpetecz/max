@@ -4,17 +4,17 @@ How we document HTTP APIs for **humans**, **agents**, and **tools**.
 
 ## Recommendation: both markdown and Swagger (different roles)
 
-| Layer | Format | When | Audience |
-| ----- | ------ | ---- | ---------- |
-| **Planning** | [api-outline.md](./api-outline.md) | Before / during Phase 0 scaffold | Agents, quick agreement on routes |
-| **Implementation** | **OpenAPI via `@nestjs/swagger`** | As soon as `apps/api` exists | Humans (Swagger UI), codegen, contract tests |
-| **Agent shortcut** | `apps/api/openapi.json` (exported) | Committed or CI artifact | Coding agents — machine-readable |
+| Layer              | Format                             | When                             | Audience                                     |
+| ------------------ | ---------------------------------- | -------------------------------- | -------------------------------------------- |
+| **Planning**       | [api-outline.md](./api-outline.md) | Before / during Phase 0 scaffold | Agents, quick agreement on routes            |
+| **Implementation** | **OpenAPI via `@nestjs/swagger`**  | As soon as `apps/api` exists     | Humans (Swagger UI), codegen, contract tests |
+| **Agent shortcut** | `apps/api/openapi.json` (exported) | Committed or CI artifact         | Coding agents — machine-readable             |
 
 **Do not** maintain two diverging sources forever. Rule:
 
 1. **Now:** `api-outline.md` is the contract for Phase 0 planning.
 2. **After first controller lands:** Nest decorators become **source of truth**.
-3. **Keep `api-outline.md`** as a one-page index (or delete sections duplicated in Swagger) and add at the top: *“Canonical: `apps/api/openapi.json` or `/api/docs`.”*
+3. **Keep `api-outline.md`** as a one-page index (or delete sections duplicated in Swagger) and add at the top: _“Canonical: `apps/api/openapi.json` or `/api/docs`.”_
 
 ### Why Swagger (OpenAPI), not markdown alone?
 

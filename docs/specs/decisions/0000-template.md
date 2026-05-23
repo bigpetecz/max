@@ -28,7 +28,7 @@ _TBD: What we will do._
 
 | Alternative | Why not chosen |
 | ----------- | -------------- |
-| _TBD_ | _TBD_ |
+| _TBD_       | _TBD_          |
 
 ## References
 

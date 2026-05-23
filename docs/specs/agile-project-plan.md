@@ -6,10 +6,10 @@ Delivery timeline and sprint phases for **Max**. Product: [product-requirements.
 
 **Lightweight Agile** — **1-week sprints**
 
-| Focus | Description |
-| ----- | ----------- |
-| Working software early | End-to-end Sbazar path before polish |
-| Iterative expansion | Rohlik, AI, voice, mobile in later phases |
+| Focus                           | Description                                              |
+| ------------------------------- | -------------------------------------------------------- |
+| Working software early          | End-to-end Sbazar path before polish                     |
+| Iterative expansion             | Rohlik, AI, voice, mobile in later phases                |
 | Strong architectural foundation | AI / API / worker / integrations separation from day one |
 
 ---
@@ -18,14 +18,14 @@ Delivery timeline and sprint phases for **Max**. Product: [product-requirements.
 
 Agile plan phases include **week ranges**. Product PRD uses **Phase 0** for MVP outcomes; architecture doc uses **Phase 2+** for Rohlik/voice/mobile. Use this table to cross-reference:
 
-| Agile phase | Weeks | Product / PRD | Architecture doc |
-| ----------- | ----- | --------------- | ---------------- |
-| **0 — Foundation** | 1–2 | MVP / Phase 0 goals | Core platform + Sbazar |
-| **1 — Stabilization** | 3–4 | MVP hardening | Credentials, retries, validation |
-| **2 — Second integration** | 5–6 | Rohlik (future §8) | Rohlik + capability metadata |
-| **3 — AI enhancement** | 7–8 | Planner improvements | Ollama tuning, suggestions |
-| **4 — Voice** | Future | Voice (non-goal MVP) | Whisper pipeline |
-| **5 — Mobile** | Future | SwiftUI (non-goal MVP) | iOS client |
+| Agile phase                | Weeks  | Product / PRD          | Architecture doc                 |
+| -------------------------- | ------ | ---------------------- | -------------------------------- |
+| **0 — Foundation**         | 1–2    | MVP / Phase 0 goals    | Core platform + Sbazar           |
+| **1 — Stabilization**      | 3–4    | MVP hardening          | Credentials, retries, validation |
+| **2 — Second integration** | 5–6    | Rohlik (future §8)     | Rohlik + capability metadata     |
+| **3 — AI enhancement**     | 7–8    | Planner improvements   | Ollama tuning, suggestions       |
+| **4 — Voice**              | Future | Voice (non-goal MVP)   | Whisper pipeline                 |
+| **5 — Mobile**             | Future | SwiftUI (non-goal MVP) | iOS client                       |
 
 ---
 
@@ -61,10 +61,10 @@ Build minimal working system for **Sbazar** automation.
 
 ## Sprint breakdown (suggested)
 
-| Sprint | Focus |
-| ------ | ----- |
+| Sprint      | Focus                                                                                         |
+| ----------- | --------------------------------------------------------------------------------------------- |
 | **S1 (W1)** | Nx scaffold; Google auth + sessions; Postgres; Spec Kit; chat UI shell; credential grant stub |
-| **S2 (W2)** | AI → JSON; approval; worker + Playwright; grant E2E; Sbazar listing (session or password) |
+| **S2 (W2)** | AI → JSON; approval; worker + Playwright; grant E2E; Sbazar listing (session or password)     |
 
 ---
 
@@ -90,10 +90,10 @@ Make the system **reliable** and **reusable**.
 
 ## Sprint breakdown (suggested)
 
-| Sprint | Focus |
-| ------ | ----- |
+| Sprint      | Focus                                                    |
+| ----------- | -------------------------------------------------------- |
 | **S3 (W3)** | Credential vault + worker injection; session persistence |
-| **S4 (W4)** | Retries, observability, validation UX, regression tests |
+| **S4 (W4)** | Retries, observability, validation UX, regression tests  |
 
 ---
 
@@ -117,9 +117,9 @@ Add a second real-world use case (**Rohlik**).
 
 ## Sprint breakdown (suggested)
 
-| Sprint | Focus |
-| ------ | ----- |
-| **S5 (W5)** | Rohlik adapter + schemas; capability registry |
+| Sprint      | Focus                                            |
+| ----------- | ------------------------------------------------ |
+| **S5 (W5)** | Rohlik adapter + schemas; capability registry    |
 | **S6 (W6)** | Rohlik E2E flows; multi-integration task routing |
 
 ---
@@ -145,9 +145,9 @@ Improve the **intelligence layer** (planning only — not execution).
 
 ## Sprint breakdown (suggested)
 
-| Sprint | Focus |
-| ------ | ----- |
-| **S7 (W7)** | Prompt tuning, evaluation set, suggestion UX |
+| Sprint      | Focus                                          |
+| ----------- | ---------------------------------------------- |
+| **S7 (W7)** | Prompt tuning, evaluation set, suggestion UX   |
 | **S8 (W8)** | Price recommendation; validation feedback loop |
 
 ---
@@ -189,20 +189,20 @@ _Out of current 8-week delivery window._
 
 Non-negotiable across all phases:
 
-| Principle | Rule |
-| --------- | ---- |
-| AI boundary | AI **never** directly controls the browser |
-| Execution | **Deterministic** workflows only in worker/integrations |
-| Integrations | **Isolated modules** per website |
-| Tasks | **Schema-driven** — Spec Kit + Zod |
-| Safety | **Approval required** for destructive actions (e.g. publish) |
+| Principle    | Rule                                                         |
+| ------------ | ------------------------------------------------------------ |
+| AI boundary  | AI **never** directly controls the browser                   |
+| Execution    | **Deterministic** workflows only in worker/integrations      |
+| Integrations | **Isolated modules** per website                             |
+| Tasks        | **Schema-driven** — Spec Kit + Zod                           |
+| Safety       | **Approval required** for destructive actions (e.g. publish) |
 
 ---
 
 # Traceability
 
-| Agile phase | Specs to update when done |
-| ----------- | ------------------------- |
-| 0 | [IMPLEMENTATION.md](../IMPLEMENTATION.md) checklist, [requirements.md](./requirements.md) status |
-| 1 | [architecture.md](./architecture.md) §10 risks |
-| 2+ | [product-requirements.md](./product-requirements.md) §8 |
+| Agile phase | Specs to update when done                                                                        |
+| ----------- | ------------------------------------------------------------------------------------------------ |
+| 0           | [IMPLEMENTATION.md](../IMPLEMENTATION.md) checklist, [requirements.md](./requirements.md) status |
+| 1           | [architecture.md](./architecture.md) §10 risks                                                   |
+| 2+          | [product-requirements.md](./product-requirements.md) §8                                          |

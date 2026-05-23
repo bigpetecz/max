@@ -35,7 +35,9 @@ async function runCommand(command, args) {
       if (code === 0) {
         resolve(undefined);
       } else {
-        reject(new Error(`${command} ${args.join(' ')} exited with code ${code}`));
+        reject(
+          new Error(`${command} ${args.join(' ')} exited with code ${code}`),
+        );
       }
     });
   });
@@ -84,7 +86,13 @@ async function main() {
   });
 
   try {
-    await runCommand('pnpm', ['prisma', 'migrate', 'deploy', '--schema', 'apps/api/prisma/schema.prisma']);
+    await runCommand('pnpm', [
+      'prisma',
+      'migrate',
+      'deploy',
+      '--schema',
+      'apps/api/prisma/schema.prisma',
+    ]);
 
     const api = startProcess('api', 'pnpm', ['nx', 'serve', 'api'], {
       API_PORT: '3000',
@@ -92,8 +100,13 @@ async function main() {
     children.push(api);
 
     const apiHealth = await waitForHealth(apiUrl, 'API', deadlineMs);
-    if (apiHealth?.dependencies?.postgres !== 'up' || apiHealth?.dependencies?.redis !== 'up') {
-      throw new Error(`API dependency checks failed: ${JSON.stringify(apiHealth)}`);
+    if (
+      apiHealth?.dependencies?.postgres !== 'up' ||
+      apiHealth?.dependencies?.redis !== 'up'
+    ) {
+      throw new Error(
+        `API dependency checks failed: ${JSON.stringify(apiHealth)}`,
+      );
     }
 
     const worker = startProcess('worker', 'pnpm', ['nx', 'serve', 'worker'], {
@@ -106,8 +119,13 @@ async function main() {
     children.push(worker);
 
     const workerHealth = await waitForHealth(workerUrl, 'Worker', deadlineMs);
-    if (workerHealth?.dependencies?.redis !== 'up' || workerHealth?.dependencies?.api !== 'up') {
-      throw new Error(`Worker dependency checks failed: ${JSON.stringify(workerHealth)}`);
+    if (
+      workerHealth?.dependencies?.redis !== 'up' ||
+      workerHealth?.dependencies?.api !== 'up'
+    ) {
+      throw new Error(
+        `Worker dependency checks failed: ${JSON.stringify(workerHealth)}`,
+      );
     }
 
     console.log('Connectivity verification passed.');

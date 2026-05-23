@@ -43,12 +43,12 @@ Implementation choices:
 
 ## Alternatives considered
 
-| Alternative | Why not chosen |
-| ----------- | -------------- |
-| Email + password | Operational burden; not requested |
-| Magic link | Extra infra; Google SSO already requested |
-| Auth0 / Clerk | Valid later; adds cost/complexity for solo MVP |
-| JWT-only in localStorage | Worse XSS surface; harder revocation |
+| Alternative              | Why not chosen                                 |
+| ------------------------ | ---------------------------------------------- |
+| Email + password         | Operational burden; not requested              |
+| Magic link               | Extra infra; Google SSO already requested      |
+| Auth0 / Clerk            | Valid later; adds cost/complexity for solo MVP |
+| JWT-only in localStorage | Worse XSS surface; harder revocation           |
 
 ## References
 

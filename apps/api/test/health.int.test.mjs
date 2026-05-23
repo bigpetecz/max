@@ -36,7 +36,9 @@ async function waitForHealth(url, timeoutMs, child) {
 
   while (Date.now() < deadline) {
     if (child?.exitCode !== null) {
-      throw new Error(`Process exited before health endpoint became ready: ${url}`);
+      throw new Error(
+        `Process exited before health endpoint became ready: ${url}`,
+      );
     }
 
     try {
@@ -57,7 +59,8 @@ async function waitForHealth(url, timeoutMs, child) {
 test('api health endpoint reports postgres and redis as up', async () => {
   const api = startProcess('pnpm', ['nx', 'serve', 'api'], {
     API_PORT: String(API_PORT),
-    DATABASE_URL: process.env.DATABASE_URL || 'postgresql://max:max@localhost:5432/max',
+    DATABASE_URL:
+      process.env.DATABASE_URL || 'postgresql://max:max@localhost:5432/max',
     REDIS_URL: process.env.REDIS_URL || 'redis://localhost:6379',
   });
 
