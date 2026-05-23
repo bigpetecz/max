@@ -14,18 +14,18 @@ Aligned with [architecture.md](./architecture.md). ADRs: [0001](./decisions/0001
 
 | App | Framework | Hosting | Status |
 | --- | --------- | ------- | ------ |
-| `web` | React + Vite | _TBD_ | Not started |
-| `api` | NestJS + SWC | _TBD_ | Not started |
-| `worker` | Node + Playwright | Isolated containers | Not started |
+| `web` | React + Vite | _TBD_ | Scaffolded |
+| `api` | NestJS + SWC | _TBD_ | Scaffolded |
+| `worker` | Node + Playwright | Isolated containers | Scaffolded |
 
 ## Libraries
 
 | Library | Purpose | Status |
 | ------- | ------- | ------ |
-| `spec-kit` | Task schemas, capabilities, Zod validation | Not started |
-| `integrations/sbazar` | Sbazar Playwright workflows | Not started |
+| `spec-kit` | Task schemas, capabilities, Zod validation | Scaffolded |
+| `integrations/sbazar` | Sbazar Playwright workflows | Scaffolded |
 | `integrations/rohlik` | Rohlik workflows | Phase 2 |
-| `shared` | Types, utilities | Not started |
+| `shared` | Types, utilities | Scaffolded |
 
 ## Backend / API
 
@@ -93,9 +93,10 @@ Aligned with [architecture.md](./architecture.md). ADRs: [0001](./decisions/0001
 | Tool | Purpose | Status |
 | ---- | ------- | ------ |
 | ESLint | Linting | With Nx apps |
-| Prettier | Formatting | _TBD_ |
+| Prettier | Formatting | Configured |
 | CI | _TBD_ | GitHub Actions or other |
-| E2E | Playwright | Worker/integration tests; web e2e _TBD_ |
+| Integration tests | Node test runner + Nx targets | API/worker connectivity smoke tests implemented |
+| E2E | Playwright | Worker/browser flows planned; web e2e _TBD_ |
 
 ## Third-party services
 

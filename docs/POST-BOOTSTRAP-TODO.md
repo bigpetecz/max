@@ -8,11 +8,11 @@ Checklist of recommendations to apply **after** generating the Nx monorepo (`app
 
 ### Monorepo & apps
 
-- [ ] Generate apps per [architecture.md](./specs/architecture.md): `web` (React + Vite), `api` (NestJS + SWC), `worker`
-- [ ] Generate libs: `spec-kit`, `shared`, `integrations/sbazar`
-- [ ] Wire Nx project graph and `nx run-many` scripts for dev (`api`, `web`, `worker`, `redis`)
-- [ ] Copy [.env.example](../.env.example) → `.env` / per-app env; fill Google OAuth placeholders
-- [ ] Add `docker-compose.yml` for local Postgres + Redis (optional but recommended)
+- [x] Generate apps per [architecture.md](./specs/architecture.md): `web` (React + Vite), `api` (NestJS + SWC), `worker`
+- [x] Generate libs: `spec-kit`, `shared`, `integrations/sbazar`
+- [x] Wire Nx project graph and `nx run-many` scripts for dev (`api`, `web`, `worker`, `redis`)
+- [x] Copy [.env.example](../.env.example) → `.env` / per-app env; fill Google OAuth placeholders
+- [x] Add `docker-compose.yml` for local Postgres + Redis (optional but recommended)
 
 ### Decisions to lock (update docs when chosen)
 
@@ -22,7 +22,7 @@ Checklist of recommendations to apply **after** generating the Nx monorepo (`app
 - [ ] **Q1 API prefix** (default `/api`) — README + Nest `setGlobalPrefix`
 - [ ] **Q2 OAuth callback** on API — match Google Console redirect URI
 - [ ] **Q3 SSE vs WebSocket** — implement one in S2
-- [ ] `prisma init` in `apps/api`; first migration for architecture §6 tables
+- [x] `prisma init` in `apps/api`; first migration for architecture §6 tables
 
 ### Agent & editor setup (mostly done — verify)
 
@@ -34,7 +34,7 @@ Checklist of recommendations to apply **after** generating the Nx monorepo (`app
 
 ### Database
 
-- [ ] Postgres migrations: `users`, `sessions`, `tasks`, `task_runs`, `chat_messages`, `integrations`, `integration_credentials`, `credential_grants`
+- [x] Postgres migrations: `users`, `sessions`, `tasks`, `task_runs`, `chat_messages`, `integrations`, `integration_credentials`, `credential_grants`
 - [ ] Seed row for `integrations.sbazar`
 
 ---
@@ -79,6 +79,7 @@ Checklist of recommendations to apply **after** generating the Nx monorepo (`app
 - [ ] CI pipeline: `nx affected -t lint,test,build` on PR
 - [ ] CI: export OpenAPI and fail if `openapi.json` drift vs committed copy (optional)
 - [ ] Contract tests against OpenAPI or Schemathesis (optional, later)
+- [x] Integration smoke tests: `api:integration`, `worker:integration`, and root `test:integration`
 
 ---
 

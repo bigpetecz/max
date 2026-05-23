@@ -46,8 +46,8 @@ Single entry point for **humans and coding agents** implementing Max. Do not rea
 
 ### S1 (week 1)
 
-- [ ] Nx: `apps/web` (React + Vite), `apps/api` (NestJS + SWC), `apps/worker`, `libs/spec-kit`, `libs/shared`, `libs/integrations/sbazar`
-- [ ] Postgres + migrations: `users`, `sessions`, `tasks`, `integrations`, `integration_credentials`
+- [x] Nx: `apps/web` (React + Vite), `apps/api` (NestJS + SWC), `apps/worker`, `libs/spec-kit`, `libs/shared`, `libs/integrations/sbazar`
+- [x] Postgres + migrations: `users`, `sessions`, `tasks`, `integrations`, `integration_credentials`
 - [ ] Google SSO: routes in § authentication.md
 - [ ] Spec Kit: `sbazar.createListing` Zod schema
 - [ ] React: login, chat shell, empty task list

@@ -1,0 +1,23 @@
+{
+  "name": "spec-kit",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/spec-kit/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/libs/spec-kit",
+        "main": "libs/spec-kit/src/index.ts",
+        "tsConfig": "libs/spec-kit/tsconfig.lib.json",
+        "assets": [
+          "libs/spec-kit/*.md"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

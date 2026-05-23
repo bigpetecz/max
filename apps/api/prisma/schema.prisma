@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum TaskStatus {
+  Draft
+  PendingApproval
+  Approved
+  Queued
+  Running
+  Succeeded
+  Failed
+}
+
+enum CredentialKind {
+  password
+  storage_state
+}
+
+model User {
+  id           String                  @id @default(cuid())
+  googleSub    String                  @unique @map("google_sub")
+  email        String                  @unique
+  createdAt    DateTime                @default(now()) @map("created_at")
+  updatedAt    DateTime                @updatedAt @map("updated_at")
+  sessions     Session[]
+  tasks        Task[]
+  chatMessages ChatMessage[]
+  credentials  IntegrationCredential[]
+
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model Task {
+  id           String        @id @default(cuid())
+  userId       String        @map("user_id")
+  taskType     String        @map("task_type")
+  payloadJson  Json          @map("payload_json")
+  status       TaskStatus    @default(Draft)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  runs         TaskRun[]
+  chatMessages ChatMessage[]
+
+  @@index([userId, status])
+  @@map("tasks")
+}
+
+model TaskRun {
+  id        String   @id @default(cuid())
+  taskId    String   @map("task_id")
+  status    String
+  logsRef   String?  @map("logs_ref")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("task_runs")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  threadId  String   @map("thread_id")
+  role      String
+  content   String
+  taskId    String?  @map("task_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([userId, threadId])
+  @@index([taskId])
+  @@map("chat_messages")
+}
+
+model Integration {
+  id          String                  @id @default(cuid())
+  slug        String                  @unique
+  capabilities Json
+  createdAt   DateTime                @default(now()) @map("created_at")
+  updatedAt   DateTime                @updatedAt @map("updated_at")
+  credentials IntegrationCredential[]
+  grants      CredentialGrant[]
+
+  @@map("integrations")
+}
+
+model IntegrationCredential {
+  id          String         @id @default(cuid())
+  userId      String         @map("user_id")
+  integrationId String       @map("integration_id")
+  kind        CredentialKind
+  ciphertext  Bytes
+  dekEncrypted Bytes         @map("dek_encrypted")
+  createdAt   DateTime       @default(now()) @map("created_at")
+  updatedAt   DateTime       @updatedAt @map("updated_at")
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  integration Integration    @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, integrationId, kind])
+  @@index([integrationId])
+  @@map("integration_credentials")
+}
+
+model CredentialGrant {
+  id            String      @id @default(cuid())
+  jobId         String      @unique @map("job_id")
+  userId        String      @map("user_id")
+  integrationId String      @map("integration_id")
+  expiresAt     DateTime    @map("expires_at")
+  consumedAt    DateTime?   @map("consumed_at")
+  createdAt     DateTime    @default(now()) @map("created_at")
+  integration   Integration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+  @@map("credential_grants")
+}

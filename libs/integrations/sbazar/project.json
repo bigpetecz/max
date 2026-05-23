@@ -1,0 +1,23 @@
+{
+  "name": "sbazar",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/integrations/sbazar/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": [
+        "{options.outputPath}"
+      ],
+      "options": {
+        "outputPath": "dist/libs/integrations/sbazar",
+        "main": "libs/integrations/sbazar/src/index.ts",
+        "tsConfig": "libs/integrations/sbazar/tsconfig.lib.json",
+        "assets": [
+          "libs/integrations/sbazar/*.md"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

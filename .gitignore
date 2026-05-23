@@ -42,3 +42,10 @@ Thumbs.db
 .nx/workspace-data
 .claude/worktrees
 .claude/settings.local.json
+
+vite.config.*.timestamp*
+
+# local environment files
+.env
+.env.*
+!.env.example

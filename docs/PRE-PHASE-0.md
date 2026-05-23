@@ -9,7 +9,7 @@ Everything to prepare **before** Sprint 1 feature work. Phase 0 coding checklist
 - [x] Product + architecture specs, ADRs (Google SSO, credential vault)
 - [x] Agent docs: `AGENTS.md`, `IMPLEMENTATION.md`, Cursor rules, `.env.example`
 - [x] API outline, task contracts (`sbazar.createListing`), post-bootstrap TODO list
-- [x] Empty Nx workspace (`nx` 22.7.2) — **no apps/libs yet**
+- [x] Nx workspace bootstrapped with apps/libs, Prisma schema + initial migration, and local Docker infra
 
 ---
 
