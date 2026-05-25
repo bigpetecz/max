@@ -16,6 +16,8 @@ Documentation: **[docs/PRE-PHASE-0.md](./docs/PRE-PHASE-0.md)** → **[docs/IMPL
 - Prisma configured in `apps/api/prisma/schema.prisma` with initial migration applied
 - Local infra configured in `docker-compose.yml` (Postgres + Redis)
 - Integration smoke tests added for API and worker
+- Google SSO baseline implemented with API refresh/logout flow and protected API access
+- Web auth gate + chat shell implemented and connected to API chat streaming route
 
 ## Quickstart
 

@@ -11,6 +11,10 @@ import type { AuthUser } from './auth.types';
 const ACCESS_TOKEN_TTL = '15m';
 const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
+function normalizeOrigin(origin: string): string {
+  return origin.trim().replace(/\/$/, '');
+}
+
 @Injectable()
 export class AuthService {
   private readonly prisma = new PrismaClient();
@@ -18,7 +22,16 @@ export class AuthService {
   constructor(private readonly jwtService: JwtService) {}
 
   get webOrigin(): string {
-    return process.env.WEB_ORIGIN || 'http://localhost:4200';
+    const configuredOrigin = process.env.WEB_ORIGIN;
+
+    if (!configuredOrigin) {
+      return 'http://localhost:4200';
+    }
+
+    // Support comma-separated origins; redirects should use the first one.
+    return normalizeOrigin(
+      configuredOrigin.split(',')[0] ?? 'http://localhost:4200',
+    );
   }
 
   async upsertGoogleUser(googleSub: string, email: string): Promise<AuthUser> {
@@ -65,7 +78,13 @@ export class AuthService {
       throw new UnauthorizedException('Refresh token is invalid or expired');
     }
 
-    await this.prisma.session.delete({ where: { id: session.id } });
+    const deleteResult = await this.prisma.session.deleteMany({
+      where: { id: session.id },
+    });
+
+    if (deleteResult.count === 0) {
+      throw new UnauthorizedException('Refresh token is invalid or expired');
+    }
 
     const user: AuthUser = { id: session.user.id, email: session.user.email };
     const newRefreshToken = await this.createRefreshToken(user.id);
@@ -111,7 +130,13 @@ export class AuthService {
 
         const key = part.slice(0, separator);
         const value = part.slice(separator + 1);
-        acc[key] = decodeURIComponent(value);
+        // Some browser/devtool extensions may send malformed cookie encoding.
+        // Preserve the raw value instead of failing the whole request.
+        try {
+          acc[key] = decodeURIComponent(value);
+        } catch {
+          acc[key] = value;
+        }
         return acc;
       }, {});
   }

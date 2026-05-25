@@ -34,7 +34,7 @@ Single entry point for **humans and coding agents** implementing Max. Do not rea
 
 **After Nx bootstrap:** work through [POST-BOOTSTRAP-TODO.md](./POST-BOOTSTRAP-TODO.md) (tooling, Swagger, CI, agent hygiene).
 
-## Progress snapshot (2026-05-23)
+## Progress snapshot (2026-05-25)
 
 - [x] Nx workspace scaffolded (`web`, `api`, `worker`, `spec-kit`, `shared`, `integrations/sbazar`)
 - [x] Local infra running via `docker-compose.yml` (Postgres + Redis)
@@ -47,6 +47,10 @@ Single entry point for **humans and coding agents** implementing Max. Do not rea
   - [x] Nx format checks
   - [x] Husky + lint-staged pre-commit workflow
   - [x] GitHub Actions CI with affected lint/format on PRs and full checks on `main`
+- [x] Phase 0 chat/auth UX baseline implemented:
+  - [x] Web login gate + authenticated chat shell in `apps/web`
+  - [x] API protected chat streaming endpoint in `apps/api`
+  - [x] Web chat wired to API bearer token flow (`/auth/refresh` + `/chat/stream`)
 
 ## Recommended next step
 
@@ -68,7 +72,8 @@ Single entry point for **humans and coding agents** implementing Max. Do not rea
 - [x] Postgres + migrations: `users`, `sessions`, `tasks`, `integrations`, `integration_credentials`
 - [x] Google SSO auth baseline: Passport Google strategy + JWT access + refresh rotation routes
 - [ ] Spec Kit: `sbazar.createListing` Zod schema
-- [ ] React: login, chat shell, empty task list
+- [x] React: login + chat shell
+- [ ] React: empty task list
 
 ### S2 (week 2)
 
