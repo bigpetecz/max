@@ -27,6 +27,29 @@ type RefreshResponse = {
   accessToken: string;
 };
 
+type TaskStatus =
+  | 'Draft'
+  | 'PendingApproval'
+  | 'Approved'
+  | 'Queued'
+  | 'Running'
+  | 'Succeeded'
+  | 'Failed';
+
+type DraftTask = {
+  id: string;
+  taskType: string;
+  status: TaskStatus;
+  payload: {
+    title: string;
+    price: number;
+    description: string;
+    imagePaths?: string[];
+  };
+  createdAt: string;
+  updatedAt: string;
+};
+
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
@@ -80,6 +103,109 @@ function ChatInterface({
   accessToken: string;
   onSignOut: () => Promise<void>;
 }) {
+  const [draftTask, setDraftTask] = useState<DraftTask | null>(null);
+  const [taskActionError, setTaskActionError] = useState<string | null>(null);
+  const [taskActionPending, setTaskActionPending] = useState<
+    'approve' | 'reject' | null
+  >(null);
+  const lastDraftPromptRef = useRef<string | null>(null);
+
+  const createDraftFromChat = async (content: string) => {
+    const response = await fetch(`${API_BASE_URL}/chat/messages`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ content }),
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    const data = (await response.json()) as {
+      task?: DraftTask;
+    };
+
+    if (data.task) {
+      setDraftTask(data.task);
+      setTaskActionError(null);
+    }
+  };
+
+  const approveDraftTask = async () => {
+    if (!draftTask) {
+      return;
+    }
+
+    setTaskActionPending('approve');
+    setTaskActionError(null);
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/tasks/${draftTask.id}/approve`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to approve task.');
+      }
+
+      const data = (await response.json()) as { status: TaskStatus };
+      setDraftTask((current) => {
+        if (!current) {
+          return current;
+        }
+
+        return {
+          ...current,
+          status: data.status,
+        };
+      });
+    } catch {
+      setTaskActionError('Could not approve this task. Please try again.');
+    } finally {
+      setTaskActionPending(null);
+    }
+  };
+
+  const rejectDraftTask = async () => {
+    if (!draftTask) {
+      return;
+    }
+
+    setTaskActionPending('reject');
+    setTaskActionError(null);
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/tasks/${draftTask.id}/reject`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to reject task.');
+      }
+
+      setDraftTask(null);
+    } catch {
+      setTaskActionError('Could not reject this task. Please try again.');
+    } finally {
+      setTaskActionPending(null);
+    }
+  };
+
   const runtime = useLocalRuntime({
     run: async function* ({ messages, abortSignal }) {
       const chatMessages = messages
@@ -102,6 +228,19 @@ function ChatInterface({
           };
         })
         .filter((message) => message.content.length > 0);
+
+      const latestUserPrompt = [...chatMessages]
+        .reverse()
+        .find((message) => message.role === 'user')?.content;
+
+      if (
+        latestUserPrompt &&
+        /sbazar/i.test(latestUserPrompt) &&
+        lastDraftPromptRef.current !== latestUserPrompt
+      ) {
+        lastDraftPromptRef.current = latestUserPrompt;
+        void createDraftFromChat(latestUserPrompt);
+      }
 
       const response = await fetch(`${API_BASE_URL}/chat/stream`, {
         method: 'POST',
@@ -157,6 +296,45 @@ function ChatInterface({
           Sign out
         </Button>
       </header>
+
+      {draftTask ? (
+        <section className="task-draft-panel" aria-live="polite">
+          <p className="task-draft-kicker">Task Draft Ready For Review</p>
+          <h2 className="task-draft-title">{draftTask.payload.title}</h2>
+          <p className="task-draft-meta">
+            Type: {draftTask.taskType} • Price: {draftTask.payload.price} CZK
+          </p>
+          <p className="task-draft-description">
+            {draftTask.payload.description}
+          </p>
+          <p className="task-draft-status">Status: {draftTask.status}</p>
+
+          {taskActionError ? (
+            <p className="error-text task-draft-error">{taskActionError}</p>
+          ) : null}
+
+          <div className="task-draft-actions">
+            <Button
+              type="button"
+              onClick={() => void approveDraftTask()}
+              disabled={
+                taskActionPending !== null ||
+                draftTask.status !== 'PendingApproval'
+              }
+            >
+              {taskActionPending === 'approve' ? 'Approving...' : 'Approve'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void rejectDraftTask()}
+              disabled={taskActionPending !== null}
+            >
+              {taskActionPending === 'reject' ? 'Rejecting...' : 'Reject'}
+            </Button>
+          </div>
+        </section>
+      ) : null}
 
       <AssistantRuntimeProvider runtime={runtime}>
         <section className="chat-panel">

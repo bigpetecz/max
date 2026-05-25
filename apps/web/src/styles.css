@@ -97,6 +97,58 @@ body {
   backdrop-filter: blur(8px);
 }
 
+.task-draft-panel {
+  margin-bottom: 1rem;
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.task-draft-kicker {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #1d4ed8;
+}
+
+.task-draft-title {
+  margin: 0.35rem 0 0;
+  font-size: 1.1rem;
+  line-height: 1.25;
+}
+
+.task-draft-meta {
+  margin: 0.5rem 0 0;
+  color: #1e3a8a;
+  font-size: 0.92rem;
+}
+
+.task-draft-description {
+  margin: 0.5rem 0 0;
+  color: #1f2937;
+  font-size: 0.94rem;
+}
+
+.task-draft-status {
+  margin: 0.65rem 0 0;
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.task-draft-actions {
+  margin-top: 0.85rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.task-draft-error {
+  margin-top: 0.5rem;
+}
+
 .thread-root {
   display: flex;
   flex-direction: column;
