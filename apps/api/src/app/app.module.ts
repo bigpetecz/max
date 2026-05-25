@@ -11,17 +11,20 @@ import { GoogleAuthGuard } from './google-auth.guard';
 import { GoogleStrategy } from './google.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { JwtStrategy } from './jwt.strategy';
+import { TasksController } from './tasks.controller';
+import { TasksService } from './tasks.service';
 
 @Module({
   imports: [
     PassportModule.register({ session: false }),
     JwtModule.register({}),
   ],
-  controllers: [AppController, AuthController, ChatController],
+  controllers: [AppController, AuthController, ChatController, TasksController],
   providers: [
     AppService,
     AuthService,
     ChatService,
+    TasksService,
     GoogleAuthGuard,
     GoogleStrategy,
     JwtAuthGuard,

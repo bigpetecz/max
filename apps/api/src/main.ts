@@ -5,6 +5,7 @@
 
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
 
 function normalizeOrigin(origin: string): string {
@@ -44,6 +45,23 @@ async function bootstrap() {
   const allowedOrigins = getAllowedOrigins();
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
+
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Max API')
+    .setDescription(
+      'Max control-plane API for auth, chat, tasks, and integrations.',
+    )
+    .setVersion('0.1.0')
+    .addBearerAuth()
+    .addCookieAuth('max_refresh_token')
+    .build();
+
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('docs', app, swaggerDocument, {
+    useGlobalPrefix: true,
+    jsonDocumentUrl: 'openapi.json',
+  });
+
   app.enableCors({
     origin: (
       origin: string | undefined,
@@ -76,6 +94,10 @@ async function bootstrap() {
   await app.listen(port);
   Logger.log(
     `🚀 Application is running on: http://localhost:${port}/${globalPrefix}`,
+  );
+  Logger.log(`📘 OpenAPI docs: http://localhost:${port}/${globalPrefix}/docs`);
+  Logger.log(
+    `📄 OpenAPI JSON: http://localhost:${port}/${globalPrefix}/openapi.json`,
   );
 }
 

@@ -24,6 +24,30 @@ function extractCookie(setCookie: string[] | undefined, cookieName: string) {
   return null;
 }
 
+async function createAccessTokenForUser(
+  app: INestApplication,
+  user: { id: string; email: string },
+) {
+  const callbackResponse = await request(app.getHttpServer())
+    .get('/api/auth/google/callback')
+    .query({ test_sub: user.id, test_email: user.email })
+    .redirects(0);
+
+  const refreshCookie = extractCookie(
+    callbackResponse.headers['set-cookie'],
+    'max_refresh_token',
+  );
+
+  const refreshResponse = await request(app.getHttpServer())
+    .post('/api/auth/refresh')
+    .set('Cookie', refreshCookie as string);
+
+  return {
+    accessToken: refreshResponse.body.accessToken as string,
+    refreshCookie: refreshCookie as string,
+  };
+}
+
 describe('API integration', () => {
   let app: INestApplication;
   let authUser = {
@@ -122,5 +146,79 @@ describe('API integration', () => {
       .set('Cookie', rotatedRefreshCookie as string);
 
     expect(refreshAfterLogout.status).toBe(401);
+  });
+
+  it('rejects unauthenticated access to task routes', async () => {
+    const response = await request(app.getHttpServer()).get('/api/tasks');
+
+    expect(response.status).toBe(401);
+  });
+
+  it('creates task draft from chat and supports approve/get/list/reject lifecycle', async () => {
+    const { accessToken } = await createAccessTokenForUser(app, authUser);
+
+    const draftResponse = await request(app.getHttpServer())
+      .post('/api/chat/messages')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        content: 'Prodej Nikon Monarch 10x42 na Sbazar za 12000 Kč',
+      });
+
+    expect(draftResponse.status).toBe(201);
+    expect(draftResponse.body.task.taskType).toBe('sbazar.createListing');
+    expect(draftResponse.body.task.status).toBe('PendingApproval');
+    expect(draftResponse.body.task.payload.price).toBe(12000);
+
+    const taskId = draftResponse.body.task.id as string;
+
+    const listResponse = await request(app.getHttpServer())
+      .get('/api/tasks')
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    expect(listResponse.status).toBe(200);
+    expect(
+      listResponse.body.some((task: { id: string }) => task.id === taskId),
+    ).toBe(true);
+
+    const getResponse = await request(app.getHttpServer())
+      .get(`/api/tasks/${taskId}`)
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    expect(getResponse.status).toBe(200);
+    expect(getResponse.body.id).toBe(taskId);
+
+    const approveResponse = await request(app.getHttpServer())
+      .post(`/api/tasks/${taskId}/approve`)
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    expect(approveResponse.status).toBe(201);
+    expect(approveResponse.body.status).toBe('Queued');
+
+    const rejectAfterQueueResponse = await request(app.getHttpServer())
+      .post(`/api/tasks/${taskId}/reject`)
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    expect(rejectAfterQueueResponse.status).toBe(409);
+
+    const secondDraftResponse = await request(app.getHttpServer())
+      .post('/api/chat/messages')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({
+        content: 'Prodej dalekohled na Sbazar za 5000 Kč',
+      });
+
+    const secondTaskId = secondDraftResponse.body.task.id as string;
+
+    const rejectResponse = await request(app.getHttpServer())
+      .post(`/api/tasks/${secondTaskId}/reject`)
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    expect(rejectResponse.status).toBe(201);
+
+    const deletedTaskResponse = await request(app.getHttpServer())
+      .get(`/api/tasks/${secondTaskId}`)
+      .set('Authorization', `Bearer ${accessToken}`);
+
+    expect(deletedTaskResponse.status).toBe(404);
   });
 });
