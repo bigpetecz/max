@@ -2,11 +2,14 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 import { PrismaClient, TaskStatus } from '@prisma/client';
-
-const SBZAR_TASK_TYPE = 'sbazar.createListing';
+import { ZodError } from 'zod';
+import { AiService } from './ai.service.js';
 
 type CreateDraftTaskResult = {
   id: string;
@@ -24,7 +27,13 @@ type CreateDraftTaskResult = {
 
 @Injectable()
 export class TasksService {
+  private readonly logger = new Logger(TasksService.name);
   private readonly prisma = new PrismaClient();
+
+  constructor(
+    private readonly aiService: AiService,
+    @InjectQueue('tasks') private readonly tasksQueue: Queue,
+  ) {}
 
   async createDraftTaskFromChat(
     userId: string,
@@ -34,18 +43,29 @@ export class TasksService {
       throw new BadRequestException('Message content is required');
     }
 
-    if (!/sbazar/i.test(content)) {
+    let extracted;
+    try {
+      extracted = await this.aiService.extractTask(content);
+    } catch (err) {
+      this.logger.warn(`AI task extraction failed: ${String(err)}`);
+
+      if (err instanceof ZodError) {
+        throw new BadRequestException(
+          `Could not extract a valid task from the message: ${err.issues.map((issue) => issue.message).join(', ')}`,
+        );
+      }
+
       throw new BadRequestException(
-        'Only Sbazar task drafts are supported right now. Mention "Sbazar" in the message.',
+        'Could not extract a task from the message. Try describing the item name, price in CZK, and that you want to sell it on Sbazar.',
       );
     }
 
-    const payload = this.toSbazarListingPayload(content);
+    const { payload } = extracted;
 
     const task = await this.prisma.task.create({
       data: {
         userId,
-        taskType: SBZAR_TASK_TYPE,
+        taskType: extracted.taskType,
         payloadJson: payload,
         status: TaskStatus.PendingApproval,
       },
@@ -67,14 +87,24 @@ export class TasksService {
       orderBy: { createdAt: 'desc' },
     });
 
-    return tasks.map((task) => ({
-      id: task.id,
-      taskType: task.taskType,
-      status: task.status,
-      payload: task.payloadJson,
-      createdAt: task.createdAt.toISOString(),
-      updatedAt: task.updatedAt.toISOString(),
-    }));
+    return tasks.map((task) => {
+      const t = task as {
+        id: string;
+        taskType: string;
+        status: TaskStatus;
+        payloadJson: unknown;
+        createdAt: Date;
+        updatedAt: Date;
+      };
+      return {
+        id: t.id,
+        taskType: t.taskType,
+        status: t.status,
+        payload: t.payloadJson,
+        createdAt: t.createdAt.toISOString(),
+        updatedAt: t.updatedAt.toISOString(),
+      };
+    });
   }
 
   async getUserTask(userId: string, taskId: string) {
@@ -126,6 +156,15 @@ export class TasksService {
       },
     });
 
+    await this.tasksQueue.add('execute', {
+      taskId: updated.id,
+      userId,
+      taskType: updated.taskType,
+      payload: updated.payloadJson,
+    });
+
+    this.logger.log(`Task ${updated.id} (${updated.taskType}) queued for execution`);
+
     return {
       id: updated.id,
       status: updated.status,
@@ -163,69 +202,5 @@ export class TasksService {
       ok: true,
       id: taskId,
     };
-  }
-
-  private toSbazarListingPayload(content: string) {
-    const normalized = content.trim();
-    const numericPrice = this.extractPrice(normalized);
-
-    if (!numericPrice) {
-      throw new BadRequestException(
-        'Could not infer listing price from the message. Include price in CZK.',
-      );
-    }
-
-    const titleCandidate = normalized
-      .replace(/sbazar/gi, ' ')
-      .replace(/(prodat|prodej|sell|list)\b/gi, ' ')
-      .replace(/za\s*\d[\d\s.,]*\s*(k\u010d|czk)?/gi, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    const title = (titleCandidate || 'Sbazar listing').slice(0, 120);
-    const description = `Auto-generated from chat request: ${normalized}`;
-
-    return {
-      title,
-      price: numericPrice,
-      description,
-    };
-  }
-
-  private extractPrice(content: string): number | null {
-    const explicitPriceMatch = content.match(
-      /\bza\s*(\d[\d\s.,]*)\s*(k\u010d|czk)?\b/i,
-    );
-    if (explicitPriceMatch) {
-      return this.toPositiveInt(explicitPriceMatch[1]);
-    }
-
-    const currencyMatches = [
-      ...content.matchAll(/(\d[\d\s.,]*)\s*(k\u010d|czk)\b/gi),
-    ];
-    if (currencyMatches.length > 0) {
-      const lastCurrency = currencyMatches[currencyMatches.length - 1];
-      return this.toPositiveInt(lastCurrency?.[1] || '');
-    }
-
-    const fallbackNumbers = [...content.matchAll(/\b\d[\d\s.,]*\b/g)]
-      .map((match) => this.toPositiveInt(match[0]))
-      .filter((value): value is number => value !== null && value >= 100);
-
-    if (fallbackNumbers.length === 0) {
-      return null;
-    }
-
-    return fallbackNumbers[fallbackNumbers.length - 1] || null;
-  }
-
-  private toPositiveInt(value: string): number | null {
-    const parsed = Number.parseInt(value.replace(/[^\d]/g, ''), 10);
-
-    if (!Number.isInteger(parsed) || parsed <= 0) {
-      return null;
-    }
-
-    return parsed;
   }
 }

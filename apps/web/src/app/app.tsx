@@ -53,6 +53,94 @@ type DraftTask = {
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
+const STATUS_BADGE_CLASS: Record<TaskStatus, string> = {
+  Draft: 'badge badge-draft',
+  PendingApproval: 'badge badge-pending',
+  Approved: 'badge badge-approved',
+  Queued: 'badge badge-queued',
+  Running: 'badge badge-running',
+  Succeeded: 'badge badge-succeeded',
+  Failed: 'badge badge-failed',
+};
+
+type TaskListItem = {
+  id: string;
+  taskType: string;
+  status: TaskStatus;
+  payload: { title?: string; price?: number };
+  createdAt: string;
+};
+
+function TaskListPage({
+  accessToken,
+  onBack,
+}: {
+  accessToken: string;
+  onBack: () => void;
+}) {
+  const [tasks, setTasks] = useState<TaskListItem[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/tasks`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        if (!res.ok) throw new Error('Failed to fetch tasks');
+        const data = (await res.json()) as TaskListItem[];
+        setTasks(data);
+      } catch {
+        setError('Could not load tasks.');
+      }
+    };
+
+    void fetchTasks();
+    const interval = setInterval(() => void fetchTasks(), 5000);
+    return () => clearInterval(interval);
+  }, [accessToken]);
+
+  return (
+    <main className="task-list-shell">
+      <header className="chat-header">
+        <h1 className="chat-title">Tasks</h1>
+        <Button type="button" variant="outline" onClick={onBack}>
+          ← Back to Chat
+        </Button>
+      </header>
+
+      {error ? <p className="error-text">{error}</p> : null}
+
+      {tasks.length === 0 && !error ? (
+        <p className="task-list-empty">No tasks yet. Start a chat to create one.</p>
+      ) : (
+        <ul className="task-list">
+          {tasks.map((task) => (
+            <li key={task.id} className="task-list-item">
+              <div className="task-list-item-header">
+                <span className="task-list-item-title">
+                  {task.payload.title ?? task.taskType}
+                </span>
+                <span className={STATUS_BADGE_CLASS[task.status]}>
+                  {task.status}
+                </span>
+              </div>
+              <div className="task-list-item-meta">
+                {task.taskType}
+                {task.payload.price !== undefined
+                  ? ` • ${task.payload.price} CZK`
+                  : ''}
+                {' • '}
+                {new Date(task.createdAt).toLocaleString()}
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </main>
+  );
+}
+
 function AuthScreen({
   onSignIn,
   error,
@@ -98,10 +186,12 @@ function ChatInterface({
   user,
   accessToken,
   onSignOut,
+  onViewTasks,
 }: {
   user: User;
   accessToken: string;
   onSignOut: () => Promise<void>;
+  onViewTasks: () => void;
 }) {
   const [draftTask, setDraftTask] = useState<DraftTask | null>(null);
   const [taskActionError, setTaskActionError] = useState<string | null>(null);
@@ -288,13 +378,18 @@ function ChatInterface({
           <h1 className="chat-title">Max Assistant</h1>
           <p className="chat-subtitle">Signed in as {user.email}</p>
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => void onSignOut()}
-        >
-          Sign out
-        </Button>
+        <div className="chat-header-actions">
+          <Button type="button" variant="outline" onClick={onViewTasks}>
+            Tasks
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => void onSignOut()}
+          >
+            Sign out
+          </Button>
+        </div>
       </header>
 
       {draftTask ? (
@@ -385,6 +480,7 @@ export function App() {
   const [user, setUser] = useState<User | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [view, setView] = useState<'chat' | 'tasks'>('chat');
   const didLoadSession = useRef(false);
 
   useEffect(() => {
@@ -437,6 +533,7 @@ export function App() {
     });
 
     setUser(null);
+    setView('chat');
   };
 
   if (loading) {
@@ -447,8 +544,22 @@ export function App() {
     return <AuthScreen onSignIn={signIn} error={error} />;
   }
 
+  if (view === 'tasks') {
+    return (
+      <TaskListPage
+        accessToken={accessToken}
+        onBack={() => setView('chat')}
+      />
+    );
+  }
+
   return (
-    <ChatInterface user={user} accessToken={accessToken} onSignOut={signOut} />
+    <ChatInterface
+      user={user}
+      accessToken={accessToken}
+      onSignOut={signOut}
+      onViewTasks={() => setView('tasks')}
+    />
   );
 }
 

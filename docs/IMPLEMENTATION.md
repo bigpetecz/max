@@ -34,7 +34,7 @@ Single entry point for **humans and coding agents** implementing Max. Do not rea
 
 **After Nx bootstrap:** work through [POST-BOOTSTRAP-TODO.md](./POST-BOOTSTRAP-TODO.md) (tooling, Swagger, CI, agent hygiene).
 
-## Progress snapshot (2026-05-25)
+## Progress snapshot (2026-05-26)
 
 - [x] Nx workspace scaffolded (`web`, `api`, `worker`, `spec-kit`, `shared`, `integrations/sbazar`)
 - [x] Local infra running via `docker-compose.yml` (Postgres + Redis)
@@ -51,10 +51,20 @@ Single entry point for **humans and coding agents** implementing Max. Do not rea
   - [x] Web login gate + authenticated chat shell in `apps/web`
   - [x] API protected chat streaming endpoint in `apps/api`
   - [x] Web chat wired to API bearer token flow (`/auth/refresh` + `/chat/stream`)
+- [x] OpenAPI / Swagger documentation wired to NestJS app
+- [x] In-chat task draft review UI (approve / reject) in `apps/web`
+- [x] `spec-kit`: `sbazar.createListing` Zod schema (`SbazarCreateListingTaskSchema`, `SBAZAR_CREATE_LISTING_JSON_SCHEMA`)
+- [x] Ollama AI service (`apps/api/src/app/ai.service.ts`) — replaces regex parsing; calls `POST /api/generate` with `format: "json"` + temperature 0
+- [x] BullMQ enqueue on task approve — `tasks` queue, job payload `{ taskId, userId, taskType, payload }` (no secrets)
+- [x] Internal HMAC status endpoint `PATCH /api/internal/tasks/:id/status` — worker → API callback
+- [x] Worker BullMQ consumer — `tasks` queue; dispatches by `taskType`; stubs `sbazar.createListing` workflow with Running → Succeeded status transitions
+- [x] React task list page (`/tasks` view) with 5 s polling, status badges, nav link from chat header
 
 ## Recommended next step
 
-- Implement protected Phase 0 product routes (`/tasks`, `/chat`, `/credentials`) with `JwtAuthGuard` and enforce user scoping per [specs/authentication.md](./specs/authentication.md).
+- Implement `sbazar.createListing` Playwright workflow in worker (`libs/integrations/sbazar`) using credential grant API
+- Add credential vault UI and `POST /api/credentials` management routes
+- Wire credential grants: `POST /api/internal/credential-grants` (HMAC) → worker decrypts and uses `storage_state`
 
 ## Non-negotiable rules
 
@@ -71,17 +81,19 @@ Single entry point for **humans and coding agents** implementing Max. Do not rea
 - [x] Nx: `apps/web` (React + Vite), `apps/api` (NestJS + SWC), `apps/worker`, `libs/spec-kit`, `libs/shared`, `libs/integrations/sbazar`
 - [x] Postgres + migrations: `users`, `sessions`, `tasks`, `integrations`, `integration_credentials`
 - [x] Google SSO auth baseline: Passport Google strategy + JWT access + refresh rotation routes
-- [ ] Spec Kit: `sbazar.createListing` Zod schema
+- [x] Spec Kit: `sbazar.createListing` Zod schema
 - [x] React: login + chat shell
-- [ ] React: empty task list
+- [x] React: task list page (polling, status badges)
 
 ### S2 (week 2)
 
-- [ ] AI module: Ollama → JSON → validate → `PendingApproval`
-- [ ] Approval UI → enqueue BullMQ
-- [ ] Internal `POST /internal/credential-grants` (HMAC)
-- [ ] Worker: consume job → grant → Playwright Sbazar listing E2E
-- [ ] SSE or WebSocket task status
+- [x] AI module: Ollama → JSON → validate → `PendingApproval`
+- [x] Approval UI → enqueue BullMQ
+- [x] Internal `PATCH /internal/tasks/:id/status` (HMAC) — worker status callback
+- [x] Worker: consume job → stub sbazar.createListing workflow
+- [ ] Credential vault: `POST /api/credentials` management + grant endpoint
+- [ ] Worker: real Playwright Sbazar listing E2E (uses credential grant)
+- [ ] SSE or WebSocket task status (currently REST polling)
 
 ### Phase 0 shortcuts (allowed)
 
